@@ -1,0 +1,11 @@
+---
+description: Branch- en deployregels voor dit project
+alwaysApply: true
+---
+
+# Git en Vercel
+
+- Grote wijzigingen komen op een nieuwe branch, niet rechtstreeks op `main`.
+- Kleine wijzigingen komen op de branch `test`.
+- Zet de nieuwste versie daarna online op het Vercel-project `ado-geheim-van-de-senaatkamer` (team Flitz-events) en geef de gebruiker de link.
+- De GitHub-repository is `6041371/ADO-geheim-van-de-senaatkamer`.

@@ -1,0 +1,27 @@
+{
+  "name": "ado-geheim-van-de-senaatkamer",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "node --import tsx --test lib/level1.test.ts lib/level2.test.ts lib/events/rules.test.ts lib/events/service.test.ts lib/events/neon.integration.test.ts"
+  },
+  "dependencies": {
+    "@neon/realtime": "^0.1.2",
+    "@neon/realtime-react": "^0.1.1",
+    "@neondatabase/serverless": "^1.2.0",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "server-only": "^0.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "sharp": "^0.35.5",
+    "tsx": "^4.23.15",
+    "typescript": "latest"
+  }
+}

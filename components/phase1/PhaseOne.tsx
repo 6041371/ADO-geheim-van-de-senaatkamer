@@ -1,0 +1,311 @@
+"use client";
+
+import { useCallback, useEffect, useState } from "react";
+import { COMING_SOON, DOSSIERS, EVIDENCE, HINTS, LOCKED_MESSAGE, completedTasks, type HintSet } from "@/lib/level1";
+import { DOSSIER2_EVIDENCE, DOSSIER2_HINTS, dossier1Complete, dossier2Complete, dossier2DoneCount } from "@/lib/level2";
+import type { Phase } from "@/lib/events/types";
+import { Logo } from "@/components/Logo";
+import { DossierTwo } from "./DossierTwo";
+import { IntroFilm } from "./IntroFilm";
+import { AttendanceTask, MinutesTask, RoomBriefing, TimeTask } from "./Tasks";
+
+type Screen = "menu" | "briefing" | "task" | "ending" | "dossier2" | "dossier2end";
+
+const TASK_HINTS: HintSet[] = [HINTS.attendance, HINTS.minutes, HINTS.time];
+
+export function PhaseOne({
+  teamId,
+  stepIndex,
+  phase,
+  notice,
+  onProgress,
+  onReplay,
+}: {
+  teamId: string;
+  stepIndex: number;
+  phase: Phase;
+  notice?: string | null;
+  onProgress: (stepIndex: number, phase: Phase) => Promise<boolean>;
+  onReplay: () => Promise<boolean>;
+}) {
+  const completed = completedTasks(phase, stepIndex);
+  const dossier1Done = dossier1Complete(phase, stepIndex);
+  const dossier2Done = dossier2Complete(phase, stepIndex);
+  const [introSeen, setIntroSeen] = useState(phase !== "intro");
+  const [replay, setReplay] = useState(false);
+  const [screen, setScreen] = useState<Screen>(openingScreen(phase, stepIndex));
+  const [taskIndex, setTaskIndex] = useState(Math.min(completed, 2));
+  const [dossierTask, setDossierTask] = useState<4 | 5 | 6>(4);
+  const [panel, setPanel] = useState<"hints" | "evidence" | null>(null);
+  const [hintLevel, setHintLevel] = useState(0);
+  const [banner, setBanner] = useState<string | null>(null);
+  const rememberTask = useCallback((task: 4 | 5 | 6) => setDossierTask(task), []);
+
+  useEffect(() => {
+    if (phase !== "intro") {
+      setIntroSeen(true);
+      return;
+    }
+    setIntroSeen(window.sessionStorage.getItem("ado-intro-seen") === "1");
+  }, [phase]);
+
+  const hintKey = screen === "dossier2" || screen === "dossier2end" ? `d2-${dossierTask}` : String(taskIndex);
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem(`ado-hints:${teamId}:${hintKey}`);
+    setHintLevel(stored ? Number(stored) : 0);
+  }, [teamId, hintKey]);
+
+  function finishIntro() {
+    window.sessionStorage.setItem("ado-intro-seen", "1");
+    setIntroSeen(true);
+    setReplay(false);
+  }
+
+  function openHintLevel(level: number) {
+    setHintLevel(level);
+    window.localStorage.setItem(`ado-hints:${teamId}:${hintKey}`, String(level));
+  }
+
+  async function openDossier(id: number) {
+    if (id === 2) {
+      if (!dossier1Done) {
+        setBanner(LOCKED_MESSAGE);
+        return;
+      }
+      setBanner(null);
+      setScreen(dossier2Done ? "dossier2end" : "dossier2");
+      return;
+    }
+    if (id === 3 && dossier2Done) {
+      setBanner(COMING_SOON);
+      return;
+    }
+    if (id !== 1) {
+      setBanner(LOCKED_MESSAGE);
+      return;
+    }
+    setBanner(null);
+    if (dossier1Done) {
+      setScreen("ending");
+      return;
+    }
+    if (phase === "intro") {
+      const saved = await onProgress(0, "playing");
+      if (!saved) return;
+    }
+    if (completed === 0) setScreen("briefing");
+    else {
+      setTaskIndex(completed);
+      setScreen("task");
+    }
+  }
+
+  async function solve(nextStep: number, nextPhase: Phase) {
+    return onProgress(nextStep, nextPhase);
+  }
+
+  async function replayLevels() {
+    const saved = await onReplay();
+    if (!saved) return;
+    for (const key of Object.keys(window.localStorage)) {
+      if (key.startsWith(`ado-hints:${teamId}:`)) window.localStorage.removeItem(key);
+    }
+    setTaskIndex(0);
+    setDossierTask(4);
+    setHintLevel(0);
+    setPanel(null);
+    setBanner(null);
+    setScreen("menu");
+  }
+
+  if (!introSeen || replay) return <IntroFilm onDone={finishIntro} />;
+
+  const hint = screen === "dossier2" || screen === "dossier2end" ? DOSSIER2_HINTS[dossierTask] : (TASK_HINTS[taskIndex] ?? HINTS.attendance);
+  const shownEvidence = [
+    ...EVIDENCE.filter((item) => item.id <= (dossier1Done ? 3 : completed)),
+    ...DOSSIER2_EVIDENCE.filter((item) => item.id - 3 <= dossier2DoneCount(phase, stepIndex)),
+  ];
+
+  return (
+    <div className="mg">
+      <div className="mg-phone">
+        {screen === "menu" ? (
+          <section className="mg-splash">
+            <Logo className="mg-logo" />
+            <h1>
+              Het geheim
+              <br />
+              van de
+              <br />
+              Senaatskamer
+            </h1>
+            <p className="mg-sub">Een interactief onderzoek binnen ADO Den Haag</p>
+            <span className="mg-badge">Vertrouwelijk</span>
+            <figure className="mg-polaroid">
+              <img src="/ado/senaatskamer-fac.jpg" alt="De Senaatskamer" />
+            </figure>
+            <button className="mg-yellow mg-cta" type="button" onClick={() => void openDossier(1)}>
+              {dossier1Done ? "Dossier 01 bekijken" : "Start onderzoek"}
+            </button>
+            <button className="mg-ghost mg-cta" type="button" onClick={() => void replayLevels()}>
+              Tijdelijk: levels opnieuw
+            </button>
+            <div className="mg-dossiers">
+              {DOSSIERS.filter((dossier) => dossier.id > 1).map((dossier) => {
+                const status = dossierStatus(dossier.id, dossier1Done, dossier2Done);
+                return (
+                  <button key={dossier.id} type="button" className={status === "Vergrendeld" ? "is-locked" : "is-ready"} onClick={() => void openDossier(dossier.id)}>
+                    <span>Dossier {dossier.code}</span>
+                    <strong>{dossier.title}</strong>
+                    <em>{status}</em>
+                  </button>
+                );
+              })}
+            </div>
+            {banner ? <p className="mg-banner">{banner}</p> : null}
+            <button className="mg-ghost" type="button" onClick={() => setReplay(true)}>
+              Speel de intro opnieuw
+            </button>
+          </section>
+        ) : null}
+
+        {screen === "briefing" ? <RoomBriefing onBack={() => setScreen("menu")} onStart={() => setScreen("task")} /> : null}
+
+        {screen === "task" && taskIndex === 0 ? (
+          <AttendanceTask
+            onBack={() => setScreen("briefing")}
+            onSolved={() => solve(1, "playing")}
+            onNext={() => {
+              setTaskIndex(1);
+            }}
+          />
+        ) : null}
+        {screen === "task" && taskIndex === 1 ? (
+          <MinutesTask
+            onBack={() => setScreen("menu")}
+            onSolved={() => solve(2, "playing")}
+            onNext={() => {
+              setTaskIndex(2);
+            }}
+          />
+        ) : null}
+        {screen === "task" && taskIndex === 2 ? (
+          <TimeTask onBack={() => setScreen("menu")} onSolved={() => solve(2, "done")} onFinished={() => setScreen("ending")} />
+        ) : null}
+
+        {screen === "dossier2" ? (
+          <DossierTwo phase={phase} stepIndex={stepIndex} onProgress={onProgress} onMenu={() => setScreen("menu")} onTask={rememberTask} />
+        ) : null}
+        {screen === "dossier2end" ? <DossierTwo phase={phase} stepIndex={stepIndex} onProgress={onProgress} onMenu={() => setScreen("menu")} onTask={rememberTask} /> : null}
+
+        {screen === "ending" ? (
+          <section className="mg-screen mg-ending">
+            <p className="mg-kicker">Dossier 01 afgerond</p>
+            <h1>De eerste gebeurtenissen liggen vast</h1>
+            <ul>
+              {EVIDENCE.map((item, index) => (
+                <li key={item.id} style={{ animationDelay: `${index * 0.35}s` }}>
+                  <strong>Bewijs 0{item.id}</strong>
+                  {item.text}
+                </li>
+              ))}
+            </ul>
+            <p>Jullie hebben de eerste gebeurtenissen van de geheime bestuursvergadering gereconstrueerd.</p>
+            <p>Maar het onderzoek is nog lang niet voorbij...</p>
+            <button className="is-ready" type="button" onClick={() => setScreen("dossier2")}>
+              <span>Dossier 02</span>
+              <strong>Het geheime dossier</strong>
+              <em>Ontgrendeld</em>
+            </button>
+            {banner ? <p className="mg-banner">{banner}</p> : null}
+          </section>
+        ) : null}
+
+        {notice ? <p className="mg-bad">{notice}</p> : null}
+
+        <nav className="mg-nav">
+          <button type="button" onClick={() => setScreen("menu")}>
+            Home
+          </button>
+          <button type="button" onClick={() => setPanel("evidence")}>
+            Bewijs
+          </button>
+          <button type="button" onClick={() => setPanel("hints")}>
+            Hints
+          </button>
+        </nav>
+
+        {panel ? (
+          <div className="mg-sheet" role="dialog" aria-modal="true">
+            {panel === "evidence" ? (
+              <>
+                <h2>Bewijsinventaris</h2>
+                {shownEvidence.length === 0 ? <p>Nog geen bewijs opgeslagen.</p> : null}
+                {shownEvidence.map((item) => (
+                  <article key={item.id}>
+                    <h3>
+                      Bewijs 0{item.id} · {item.title}
+                    </h3>
+                    <p>{item.text}</p>
+                  </article>
+                ))}
+              </>
+            ) : (
+              <>
+                <h2>Onderzoeksassistent</h2>
+                {screen === "menu" || screen === "ending" || screen === "dossier2end" ? (
+                  <p>Open een opdracht. De assistent helpt alleen bij de puzzel die openstaat.</p>
+                ) : (
+                  <>
+                    <p>{hint.props}</p>
+                    {hintLevel >= 2 ? <p>{hint.hint1}</p> : null}
+                    {hintLevel >= 3 ? <p>{hint.hint2}</p> : null}
+                    {hintLevel >= 4 && hint.hint3 ? <p>{hint.hint3}</p> : null}
+                    <div className="mg-actions">
+                      {hintLevel < 2 ? (
+                        <button className="mg-yellow" type="button" onClick={() => openHintLevel(2)}>
+                          Kleine aanwijzing
+                        </button>
+                      ) : null}
+                      {hintLevel >= 2 && hintLevel < 3 ? (
+                        <button className="mg-ghost" type="button" onClick={() => openHintLevel(3)}>
+                          Duidelijke aanwijzing
+                        </button>
+                      ) : null}
+                      {hint.hint3 && hintLevel >= 3 && hintLevel < 4 ? (
+                        <button className="mg-ghost" type="button" onClick={() => openHintLevel(4)}>
+                          Laatste aanwijzing
+                        </button>
+                      ) : null}
+                    </div>
+                  </>
+                )}
+              </>
+            )}
+            <button className="mg-ghost" type="button" onClick={() => setPanel(null)}>
+              Sluiten
+            </button>
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function openingScreen(phase: Phase, stepIndex: number): Screen {
+  if (dossier2Complete(phase, stepIndex)) return "dossier2end";
+  if (phase === "done") return "ending";
+  if (phase === "playing" && stepIndex >= 3) return "dossier2";
+  if (phase === "intro") return "menu";
+  return "task";
+}
+
+function dossierStatus(id: number, dossier1Done: boolean, dossier2Done: boolean) {
+  if (id === 2) {
+    if (dossier2Done) return "Voltooid";
+    if (dossier1Done) return "Ontgrendeld";
+  }
+  if (id === 3 && dossier2Done) return "Ontgrendeld";
+  return "Vergrendeld";
+}
