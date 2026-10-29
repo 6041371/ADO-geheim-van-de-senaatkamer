@@ -913,25 +913,33 @@ p.story,
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35);
 }
 
-.mg-tag.is-marcel { top: 11%; left: 50%; transform: translateX(-50%); }
 .mg-tag.is-karin { top: 42%; left: 8%; }
 .mg-tag.is-tom { top: 40%; right: 7%; }
 
 .mg-qmark {
   position: absolute;
-  left: 50%;
-  bottom: 11%;
   width: 74px;
   height: 74px;
   display: grid;
   place-items: center;
-  transform: translateX(-50%);
   border: 2px dashed #ffe000;
   border-radius: 14px;
   background: rgba(0, 0, 0, 0.28);
   color: #ffe000;
   font-family: var(--font-label), Impact, sans-serif;
   font-size: 40px;
+}
+
+.mg-qmark.is-head {
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.mg-qmark.is-foot {
+  left: 50%;
+  bottom: 11%;
+  transform: translateX(-50%);
 }
 
 .mg-logo,

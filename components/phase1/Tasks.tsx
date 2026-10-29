@@ -63,7 +63,7 @@ export function RoomBriefing({ onStart, onBack }: { onStart: () => void; onBack:
       <section className="mg-block">
         <p className="mg-kicker">Verhaal</p>
         <p>
-          Jullie zitten in de Senaatskamer. Jaren geleden besprak het bestuur hier in het geheim de plannen voor het stadion. Niet iedereen was bij de start van de vergadering aanwezig. Onderzoek wie er ontbreekt en gebruik de documenten op tafel.
+          Jullie zitten in de Senaatskamer. Jaren geleden besprak het bestuur hier in het geheim de plannen voor het stadion. Niet iedereen was bij de start van de vergadering aanwezig. Onderzoek wie er ontbreken en gebruik de documenten op tafel.
         </p>
       </section>
       <section className="mg-block">
@@ -114,17 +114,17 @@ export function AttendanceTask({
     <section className="mg-screen mg-meet-screen">
       <ScreenBar kicker="Opdracht 1" title="Wie was aanwezig?" step={0} onBack={onBack} />
       <div className="mg-meet">
-        <img src="/ado/tafel.jpg" alt="De tafel in de Senaatskamer. Drie plaatsen zijn bezet en één stoel is leeg." />
-        <span className="mg-tag is-marcel">Marcel<br />de Vries</span>
+        <img src="/ado/tafel.jpg" alt="De tafel in de Senaatskamer. Karin Bos en Tom Albers zitten aan tafel. Twee stoelen zijn leeg." />
         <span className="mg-tag is-karin">Karin<br />Bos</span>
         <span className="mg-tag is-tom">Tom<br />Albers</span>
-        <span className="mg-qmark" aria-hidden="true">?</span>
+        <span className="mg-qmark is-head" aria-hidden="true">?</span>
+        <span className="mg-qmark is-foot" aria-hidden="true">?</span>
       </div>
-      <Note text="Er ontbreekt één persoon aan tafel. Bekijk de naamkaartjes en gebruik de aanwezigheidslijst om te zien wie dat is." />
+      <Note text="Er ontbreken twee personen aan tafel. Bekijk de naamkaartjes en gebruik de aanwezigheidslijst om te zien wie dat zijn. Erik Meijer stond wel op de lijst, maar zat niet bij het bestuur aan tafel." />
       {correct ? (
         <div className="mg-success">
           <p className="mg-kicker">Juist</p>
-          <p>Sophie van Rijn was nog niet aanwezig bij het begin van de vergadering. De volgende opdracht is ontgrendeld.</p>
+          <p>Marcel de Vries en Sophie van Rijn waren nog niet aanwezig bij het begin van de vergadering. De volgende opdracht is ontgrendeld.</p>
           <button className="mg-yellow mg-cta" type="button" onClick={onNext}>
             Volgende opdracht
           </button>
@@ -138,9 +138,14 @@ export function AttendanceTask({
           }}
         >
           <p className="mg-kicker">Jouw antwoord</p>
-          <p>Wie was bij aanvang van de vergadering nog niet aanwezig?</p>
-          <input value={answer} placeholder="Volledige naam" onChange={(event) => setAnswer(event.target.value)} autoComplete="off" />
-          {wrong ? <p className="mg-bad">Dat is niet correct. Bekijk de aanwezigheidslijst en naamkaartjes opnieuw.</p> : null}
+          <p>Wie waren bij aanvang van de vergadering nog niet aanwezig?</p>
+          <input
+            value={answer}
+            placeholder="Beide volledige namen"
+            onChange={(event) => setAnswer(event.target.value)}
+            autoComplete="off"
+          />
+          {wrong ? <p className="mg-bad">Dat is niet correct. Er ontbreken twee bestuursleden. Bekijk de aanwezigheidslijst en naamkaartjes opnieuw.</p> : null}
           <button className="mg-yellow mg-cta" type="submit" disabled={pending || answer.trim().length < 3}>
             Controleer antwoord
           </button>

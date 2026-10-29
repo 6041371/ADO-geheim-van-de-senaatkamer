@@ -23,8 +23,9 @@ export type HintSet = {
 export const HINTS: Record<"attendance" | "minutes" | "time", HintSet> = {
   attendance: {
     props: "Pak de aanwezigheidslijst en de naamkaartjes van de bestuursleden.",
-    hint1: "Vergelijk de naamkaartjes op de tafel met de namen op de aanwezigheidslijst.",
-    hint2: "Er ontbreekt één naamkaartje. Controleer welke persoon nog niet bij de vergadering aanwezig was.",
+    hint1: "Vergelijk de naamkaartjes op de tafel met de namen op de aanwezigheidslijst. Karin Bos en Tom Albers zitten er wel.",
+    hint2: "Er ontbreken twee bestuursleden. Erik Meijer stond wel genoteerd, maar hoorde niet bij de lege stoelen van het bestuur.",
+    hint3: "De twee ontbrekende namen zijn Marcel de Vries en Sophie van Rijn.",
   },
   minutes: {
     props: "Pak de fysieke vergaderagenda en zoek het gele kader onderaan het document.",
@@ -40,7 +41,7 @@ export const HINTS: Record<"attendance" | "minutes" | "time", HintSet> = {
 };
 
 export const EVIDENCE = [
-  { id: 1, title: "Ontbrekende aanwezige", text: "Sophie van Rijn was nog niet aanwezig." },
+  { id: 1, title: "Ontbrekende aanwezigen", text: "Marcel de Vries en Sophie van Rijn waren nog niet aanwezig." },
   { id: 2, title: "Vertrouwelijke afspraken", text: "De stadionplannen mochten niet zonder toestemming worden gedeeld." },
   { id: 3, title: "Tijdcode", text: "Het belangrijke tijdstip was 20:24." },
 ] as const;
@@ -65,7 +66,7 @@ export const MINUTE_FRAGMENTS = [
 export const TIMELINE = [
   { time: "20:17", label: "Karin Bos is afgevinkt op de aanwezigheidslijst." },
   { time: "20:18", label: "Tom Albers is afgevinkt op de aanwezigheidslijst." },
-  { time: "20:19", label: "De secretaris is afgevinkt op de aanwezigheidslijst." },
+  { time: "20:19", label: "Erik Meijer is afgevinkt op de aanwezigheidslijst." },
   { time: "20:30", label: "Geplande start. Opening van de vergadering." },
   { time: "20:35", label: "Vaststellen agenda." },
   { time: "20:45", label: "Stadiondossier." },
@@ -85,7 +86,10 @@ export function normalizeAnswer(value: string) {
 }
 
 export function isMissingPerson(value: string) {
-  return normalizeAnswer(value) === "sophie van rijn";
+  const text = normalizeAnswer(value);
+  const hasMarcel = text.includes("marcel") && text.includes("vries");
+  const hasSophie = text.includes("sophie") && text.includes("rijn");
+  return hasMarcel && hasSophie;
 }
 
 export function isConfidentialityConclusion(value: string) {

@@ -9,12 +9,14 @@ import {
   normalizeAnswer,
 } from "./level1";
 
-test("herkent Sophie van Rijn ongeacht hoofdletters en spaties", () => {
-  assert.equal(isMissingPerson("  Sophie   van   Rijn "), true);
-  assert.equal(isMissingPerson("SOPHIE VAN RIJN"), true);
+test("herkent Marcel en Sophie samen als ontbrekende aanwezigen", () => {
+  assert.equal(isMissingPerson("Marcel de Vries en Sophie van Rijn"), true);
+  assert.equal(isMissingPerson("sophie van rijn, marcel de vries"), true);
+  assert.equal(isMissingPerson("SOPHIE VAN RIJN EN MARCEL DE VRIES"), true);
+  assert.equal(isMissingPerson("Sophie van Rijn"), false);
   assert.equal(isMissingPerson("Marcel de Vries"), false);
-  assert.equal(isMissingPerson("Sophie"), false);
   assert.equal(isMissingPerson("Erik Meijer"), false);
+  assert.equal(isMissingPerson("Erik Meijer en Sophie van Rijn"), false);
 });
 
 test("accepteert dezelfde vertrouwelijkheidsafspraak in andere woorden", () => {
