@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { COMING_SOON, DOSSIERS, EVIDENCE, HINTS, LOCKED_MESSAGE, completedTasks, type HintSet } from "@/lib/level1";
 import { DOSSIER2_EVIDENCE, DOSSIER2_HINTS, dossier1Complete, dossier2Complete, dossier2DoneCount } from "@/lib/level2";
 import type { Phase } from "@/lib/events/types";
@@ -10,6 +10,13 @@ import { IntroFilm } from "./IntroFilm";
 import { AttendanceTask, MinutesTask, RoomBriefing, TimeTask } from "./Tasks";
 
 type Screen = "menu" | "briefing" | "task" | "ending" | "dossier2" | "dossier2end";
+
+type StoredView = {
+  screen: Screen;
+  taskIndex: number;
+  dossierTask: 4 | 5 | 6;
+  forcedDossierTask: 4 | 5 | 6 | null;
+};
 
 const TASK_HINTS: HintSet[] = [HINTS.attendance, HINTS.minutes, HINTS.time];
 
@@ -31,33 +38,48 @@ export function PhaseOne({
   const completed = completedTasks(phase, stepIndex);
   const dossier1Done = dossier1Complete(phase, stepIndex);
   const dossier2Done = dossier2Complete(phase, stepIndex);
+  const fallback = defaultView(phase, stepIndex, completed);
+  const [ready, setReady] = useState(false);
   const [introSeen, setIntroSeen] = useState(phase !== "intro");
   const [replay, setReplay] = useState(false);
-  const [screen, setScreen] = useState<Screen>(openingScreen(phase, stepIndex));
-  const [taskIndex, setTaskIndex] = useState(Math.min(completed, 2));
-  const [dossierTask, setDossierTask] = useState<4 | 5 | 6>(4);
-  const [forcedDossierTask, setForcedDossierTask] = useState<4 | 5 | 6 | null>(null);
+  const [screen, setScreen] = useState<Screen>(fallback.screen);
+  const [taskIndex, setTaskIndex] = useState(fallback.taskIndex);
+  const [dossierTask, setDossierTask] = useState<4 | 5 | 6>(fallback.dossierTask);
+  const [forcedDossierTask, setForcedDossierTask] = useState<4 | 5 | 6 | null>(fallback.forcedDossierTask);
   const [panel, setPanel] = useState<"hints" | "evidence" | null>(null);
   const [hintLevel, setHintLevel] = useState(0);
   const [banner, setBanner] = useState<string | null>(null);
   const rememberTask = useCallback((task: 4 | 5 | 6) => setDossierTask(task), []);
 
+  useLayoutEffect(() => {
+    const done = completedTasks(phase, stepIndex);
+    const restored = restoreView(teamId, phase, stepIndex, done);
+    setScreen(restored.screen);
+    setTaskIndex(restored.taskIndex);
+    setDossierTask(restored.dossierTask);
+    setForcedDossierTask(restored.forcedDossierTask);
+    if (phase !== "intro") setIntroSeen(true);
+    else setIntroSeen(window.localStorage.getItem(introKey(teamId)) === "1" || window.sessionStorage.getItem("ado-intro-seen") === "1");
+    setReady(true);
+    // Alleen bij (her)laden van dit team hervatten; niet bij elke voortgangs-update.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [teamId]);
+
   useEffect(() => {
-    if (phase !== "intro") {
-      setIntroSeen(true);
-      return;
-    }
-    setIntroSeen(window.sessionStorage.getItem("ado-intro-seen") === "1");
-  }, [phase]);
+    if (!ready) return;
+    saveView(teamId, { screen, taskIndex, dossierTask, forcedDossierTask });
+  }, [ready, teamId, screen, taskIndex, dossierTask, forcedDossierTask]);
 
   const hintKey = screen === "dossier2" || screen === "dossier2end" ? `d2-${dossierTask}` : String(taskIndex);
 
   useEffect(() => {
+    if (!ready) return;
     const stored = window.localStorage.getItem(`ado-hints:${teamId}:${hintKey}`);
     setHintLevel(stored ? Number(stored) : 0);
-  }, [teamId, hintKey]);
+  }, [ready, teamId, hintKey]);
 
   function finishIntro() {
+    window.localStorage.setItem(introKey(teamId), "1");
     window.sessionStorage.setItem("ado-intro-seen", "1");
     setIntroSeen(true);
     setReplay(false);
@@ -111,8 +133,11 @@ export function PhaseOne({
     const saved = await onReplay();
     if (!saved) return;
     for (const key of Object.keys(window.localStorage)) {
-      if (key.startsWith(`ado-hints:${teamId}:`)) window.localStorage.removeItem(key);
+      if (key.startsWith(`ado-hints:${teamId}:`) || key === viewKey(teamId) || key === introKey(teamId)) {
+        window.localStorage.removeItem(key);
+      }
     }
+    setForcedDossierTask(null);
     setTaskIndex(0);
     setDossierTask(4);
     setHintLevel(0);
@@ -133,6 +158,7 @@ export function PhaseOne({
     setScreen(target.screen);
   }
 
+  if (!ready) return <p className="boot">Jullie onderzoek wordt hervat.</p>;
   if (!introSeen || replay) return <IntroFilm onDone={finishIntro} />;
 
   const hint = screen === "dossier2" || screen === "dossier2end" ? DOSSIER2_HINTS[dossierTask] : (TASK_HINTS[taskIndex] ?? HINTS.attendance);
@@ -335,12 +361,94 @@ export function PhaseOne({
   );
 }
 
-function openingScreen(phase: Phase, stepIndex: number): Screen {
-  if (dossier2Complete(phase, stepIndex)) return "dossier2end";
-  if (phase === "done") return "ending";
-  if (phase === "playing" && stepIndex >= 3) return "dossier2";
-  if (phase === "intro") return "menu";
-  return "task";
+function viewKey(teamId: string) {
+  return `ado-view:${teamId}`;
+}
+
+function introKey(teamId: string) {
+  return `ado-intro-seen:${teamId}`;
+}
+
+function defaultView(phase: Phase, stepIndex: number, completed: number): StoredView {
+  if (dossier2Complete(phase, stepIndex)) {
+    return { screen: "dossier2end", taskIndex: 2, dossierTask: 6, forcedDossierTask: null };
+  }
+  if (phase === "playing" && stepIndex >= 3) {
+    const dossierTask = (stepIndex >= 4 ? 6 : 5) as 4 | 5 | 6;
+    return { screen: "dossier2", taskIndex: 2, dossierTask, forcedDossierTask: dossierTask };
+  }
+  if (phase === "done") {
+    return { screen: "ending", taskIndex: 2, dossierTask: 4, forcedDossierTask: null };
+  }
+  if (phase === "intro") {
+    return { screen: "menu", taskIndex: 0, dossierTask: 4, forcedDossierTask: null };
+  }
+  return {
+    screen: "task",
+    taskIndex: Math.min(completed, 2),
+    dossierTask: 4,
+    forcedDossierTask: null,
+  };
+}
+
+function restoreView(teamId: string, phase: Phase, stepIndex: number, completed: number): StoredView {
+  const fallback = defaultView(phase, stepIndex, completed);
+  try {
+    const raw = window.localStorage.getItem(viewKey(teamId));
+    if (!raw) return fallback;
+    const stored = JSON.parse(raw) as Partial<StoredView>;
+    const screen = stored.screen;
+    if (!screen || !isScreen(screen)) return fallback;
+
+    if (screen === "dossier2" || screen === "dossier2end") {
+      if (!dossier1Complete(phase, stepIndex)) return fallback;
+      if (screen === "dossier2end" && !dossier2Complete(phase, stepIndex)) {
+        return { ...fallback, screen: "dossier2", forcedDossierTask: fallback.dossierTask };
+      }
+      const dossierTask = isDossierTask(stored.dossierTask) ? stored.dossierTask : fallback.dossierTask;
+      return {
+        screen,
+        taskIndex: 2,
+        dossierTask,
+        forcedDossierTask: screen === "dossier2" ? dossierTask : null,
+      };
+    }
+
+    if (screen === "ending") {
+      if (!dossier1Complete(phase, stepIndex)) return fallback;
+      return { screen: "ending", taskIndex: 2, dossierTask: 4, forcedDossierTask: null };
+    }
+
+    if (screen === "task" || screen === "briefing") {
+      if (phase === "intro") return fallback;
+      if (dossier2Complete(phase, stepIndex) || (phase === "playing" && stepIndex >= 3)) return fallback;
+      const maxTask = Math.min(Math.max(completed, 0), 2);
+      const taskIndex = typeof stored.taskIndex === "number" ? Math.min(Math.max(stored.taskIndex, 0), maxTask) : maxTask;
+      return {
+        screen: screen === "briefing" && taskIndex === 0 ? "briefing" : "task",
+        taskIndex,
+        dossierTask: 4,
+        forcedDossierTask: null,
+      };
+    }
+
+    if (screen === "menu") return { ...fallback, screen: "menu", forcedDossierTask: null };
+  } catch {
+    return fallback;
+  }
+  return fallback;
+}
+
+function saveView(teamId: string, view: StoredView) {
+  window.localStorage.setItem(viewKey(teamId), JSON.stringify(view));
+}
+
+function isScreen(value: string): value is Screen {
+  return value === "menu" || value === "briefing" || value === "task" || value === "ending" || value === "dossier2" || value === "dossier2end";
+}
+
+function isDossierTask(value: unknown): value is 4 | 5 | 6 {
+  return value === 4 || value === 5 || value === 6;
 }
 
 function dossierStatus(id: number, dossier1Done: boolean, dossier2Done: boolean) {

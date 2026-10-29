@@ -180,7 +180,8 @@ function TeamStage({ row, degraded, onHome }: { row: TeamRow; degraded: boolean;
   const current = override ? { ...row, ...override } : row;
 
   useEffect(() => {
-    setBriefingSeen(window.sessionStorage.getItem(`ado-briefing:${current.id}`) === "1");
+    const key = `ado-briefing:${current.id}`;
+    setBriefingSeen(window.localStorage.getItem(key) === "1" || window.sessionStorage.getItem(key) === "1");
   }, [current.id]);
 
   useEffect(() => {
@@ -210,6 +211,7 @@ function TeamStage({ row, degraded, onHome }: { row: TeamRow; degraded: boolean;
       return false;
     }
     window.sessionStorage.removeItem(`ado-briefing:${current.id}`);
+    window.localStorage.removeItem(`ado-briefing:${current.id}`);
     setBriefingSeen(false);
     return true;
   }
@@ -294,6 +296,7 @@ function TeamStage({ row, degraded, onHome }: { row: TeamRow; degraded: boolean;
             type="button"
             onClick={() => {
               window.sessionStorage.setItem(`ado-briefing:${current.id}`, "1");
+              window.localStorage.setItem(`ado-briefing:${current.id}`, "1");
               setBriefingSeen(true);
             }}
           >
