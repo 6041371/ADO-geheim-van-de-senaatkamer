@@ -26,6 +26,7 @@ export function PhaseOne({
   phase,
   notice,
   onProgress,
+  onJump,
   onReplay,
 }: {
   teamId: string;
@@ -33,6 +34,7 @@ export function PhaseOne({
   phase: Phase;
   notice?: string | null;
   onProgress: (stepIndex: number, phase: Phase) => Promise<boolean>;
+  onJump?: (stepIndex: number, phase: Phase) => Promise<boolean>;
   onReplay: () => Promise<boolean>;
 }) {
   const completed = completedTasks(phase, stepIndex);
@@ -46,7 +48,7 @@ export function PhaseOne({
   const [taskIndex, setTaskIndex] = useState(fallback.taskIndex);
   const [dossierTask, setDossierTask] = useState<4 | 5 | 6>(fallback.dossierTask);
   const [forcedDossierTask, setForcedDossierTask] = useState<4 | 5 | 6 | null>(fallback.forcedDossierTask);
-  const [panel, setPanel] = useState<"hints" | "evidence" | null>(null);
+  const [panel, setPanel] = useState<"hints" | "evidence" | "jumps" | null>(null);
   const [hintLevel, setHintLevel] = useState(0);
   const [banner, setBanner] = useState<string | null>(null);
   const rememberTask = useCallback((task: 4 | 5 | 6) => setDossierTask(task), []);
@@ -150,8 +152,16 @@ export function PhaseOne({
     setBanner(null);
     setPanel(null);
     setHintLevel(0);
-    const saved = await onProgress(target.step, target.phase);
-    if (!saved) return;
+    window.localStorage.setItem(introKey(teamId), "1");
+    window.sessionStorage.setItem("ado-intro-seen", "1");
+    setIntroSeen(true);
+    setReplay(false);
+    const jump = onJump ?? onProgress;
+    const saved = await jump(target.step, target.phase);
+    if (!saved) {
+      setBanner("Test-sprong mislukt. Is het evenement gestart?");
+      return;
+    }
     setTaskIndex(target.taskIndex);
     setDossierTask(target.dossierTask);
     setForcedDossierTask(target.screen === "dossier2" ? target.dossierTask : null);
@@ -191,8 +201,9 @@ export function PhaseOne({
             <button className="mg-ghost mg-cta" type="button" onClick={() => void replayLevels()}>
               Tijdelijk: levels opnieuw
             </button>
-            <details className="mg-dev">
-              <summary>Test: spring naar opdracht</summary>
+            <section className="mg-dev" aria-label="Testnavigatie">
+              <p className="mg-kicker">Test: spring naar opdracht</p>
+              <p className="mg-dev-note">Kies een opdracht. Werkt ook als je nog niet zo ver bent.</p>
               <div className="mg-dev-grid">
                 {JUMPS.map((item) => (
                   <button key={item.id} type="button" onClick={() => void jumpTo(item)}>
@@ -201,7 +212,7 @@ export function PhaseOne({
                   </button>
                 ))}
               </div>
-            </details>
+            </section>
             <div className="mg-dossiers">
               {DOSSIERS.filter((dossier) => dossier.id > 1).map((dossier) => {
                 const status = dossierStatus(dossier.id, dossier1Done, dossier2Done);
@@ -292,7 +303,7 @@ export function PhaseOne({
 
         {notice ? <p className="mg-bad">{notice}</p> : null}
 
-        <nav className="mg-nav">
+        <nav className="mg-nav mg-nav-4">
           <button type="button" onClick={() => setScreen("menu")}>
             Home
           </button>
@@ -301,6 +312,9 @@ export function PhaseOne({
           </button>
           <button type="button" onClick={() => setPanel("hints")}>
             Hints
+          </button>
+          <button type="button" onClick={() => setPanel(panel === "jumps" ? null : "jumps")}>
+            Levels
           </button>
         </nav>
 
@@ -319,7 +333,8 @@ export function PhaseOne({
                   </article>
                 ))}
               </>
-            ) : (
+            ) : null}
+            {panel === "hints" ? (
               <>
                 <h2>Onderzoeksassistent</h2>
                 {screen === "menu" || screen === "ending" || screen === "dossier2end" ? (
@@ -350,7 +365,28 @@ export function PhaseOne({
                   </>
                 )}
               </>
-            )}
+            ) : null}
+            {panel === "jumps" ? (
+              <>
+                <h2>Test: levels</h2>
+                <p>Spring direct naar een opdracht. Beschikbaar in deze build: dossier 01 en 02.</p>
+                <div className="mg-dev-grid">
+                  {JUMPS.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        setPanel(null);
+                        void jumpTo(item);
+                      }}
+                    >
+                      <strong>{item.label}</strong>
+                      {item.detail}
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : null}
             <button className="mg-ghost" type="button" onClick={() => setPanel(null)}>
               Sluiten
             </button>

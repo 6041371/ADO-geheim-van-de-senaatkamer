@@ -305,6 +305,18 @@ function TeamStage({ row, degraded, onHome }: { row: TeamRow; degraded: boolean;
     );
   }
 
+  async function jump(stepIndex: number, phase: Phase) {
+    setOverride({ step_index: stepIndex, phase, team_name: current.team_name });
+    const result = await postJson<{ row: TeamRow }>("/api/jump", { stepIndex, phase });
+    if (!result.ok) {
+      setOverride(null);
+      setError(result.data.error ?? "De test-sprong is mislukt.");
+      return false;
+    }
+    setError(null);
+    return true;
+  }
+
   return (
     <PhaseOne
       teamId={current.id}
@@ -312,6 +324,7 @@ function TeamStage({ row, degraded, onHome }: { row: TeamRow; degraded: boolean;
       phase={current.phase}
       notice={error ?? (degraded ? "De live verbinding is onderbroken. De voortgang blijft via de database bij." : null)}
       onProgress={save}
+      onJump={jump}
       onReplay={replay}
     />
   );

@@ -170,6 +170,27 @@ export class EventService {
     return this.teamSession(loaded.event, updated, false);
   }
 
+  /** Test-only: zet voortgang vrij naar elke geldige stap, zonder volgorde-check. */
+  async jump(teamToken: string, stepIndex: number, phase: Phase) {
+    const loaded = await this.teamOrThrow(teamToken);
+    if (loaded.event.status !== "started") {
+      throw new FlowError("invalid_status", "De opdrachten starten pas als de instructeur het evenement start.", 409);
+    }
+    if (stepIndex < 0 || stepIndex > LAST_STEP) {
+      throw new FlowError("invalid_status", "Die voortgang hoort niet bij dit team.", 409);
+    }
+    if (phase !== "intro" && phase !== "playing" && phase !== "done") {
+      throw new FlowError("invalid_status", "Die voortgang hoort niet bij dit team.", 409);
+    }
+    const updated = await this.store.setProgress(loaded.participant.id, {
+      stepIndex,
+      phase,
+      updatedAt: new Date(this.now()).toISOString(),
+    });
+    if (!updated) throw new FlowError("invalid_status", "De voortgang kon niet worden opgeslagen.", 409);
+    return this.teamSession(loaded.event, updated, false);
+  }
+
   async replay(teamToken: string) {
     const loaded = await this.teamOrThrow(teamToken);
     if (loaded.event.status !== "started") {

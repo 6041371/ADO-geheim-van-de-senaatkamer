@@ -1140,6 +1140,10 @@ p.story,
   z-index: 5;
 }
 
+.mg-nav.mg-nav-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
 .mg-nav button {
   min-height: var(--mg-nav-h);
   background: transparent;
@@ -2561,20 +2565,17 @@ p.story,
 
 .mg-dev {
   margin: 18px 0 10px;
-  padding: 12px 14px;
+  padding: 14px 16px;
   border: 1px dashed rgba(255, 224, 0, 0.45);
   border-radius: 12px;
   background: rgba(255, 224, 0, 0.06);
   text-align: left;
 }
 
-.mg-dev summary {
-  cursor: pointer;
-  color: #ffe000;
-  font-family: var(--font-label), Impact, sans-serif;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-size: 14px;
+.mg-dev-note {
+  margin: 4px 0 10px;
+  color: #d7d0bc;
+  font-size: var(--mg-label-size);
 }
 
 .mg-dev-grid {
