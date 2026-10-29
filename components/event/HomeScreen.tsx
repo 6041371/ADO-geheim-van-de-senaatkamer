@@ -3,15 +3,7 @@
 import { FormEvent, useState } from "react";
 import { Logo } from "@/components/Logo";
 import { postJson } from "./api";
-
-function browserId() {
-  const key = "ado-client-id";
-  const existing = window.sessionStorage.getItem(key);
-  if (existing) return existing;
-  const created = crypto.randomUUID();
-  window.sessionStorage.setItem(key, created);
-  return created;
-}
+import { browserClientId, saveTeamResume } from "./resume";
 
 export function HomeScreen({
   teamName,
@@ -24,7 +16,7 @@ export function HomeScreen({
   teamName?: string | null;
   hostCode?: string | null;
   onInstructor: () => void;
-  onJoined: () => void;
+  onJoined: (code?: string) => void;
   onContinueTeam?: () => void;
   onContinueHost?: () => void;
 }) {
@@ -36,13 +28,16 @@ export function HomeScreen({
     event.preventDefault();
     setBusy(true);
     setError(null);
-    const result = await postJson("/api/join", { code, clientId: browserId() });
+    const clientId = browserClientId();
+    const normalized = code.trim().toUpperCase();
+    const result = await postJson("/api/join", { code: normalized, clientId });
     if (!result.ok) {
       setError(result.data.error ?? "Deze code klopt niet.");
       setBusy(false);
       return;
     }
-    onJoined();
+    saveTeamResume(normalized, clientId);
+    onJoined(normalized);
   }
 
   return (

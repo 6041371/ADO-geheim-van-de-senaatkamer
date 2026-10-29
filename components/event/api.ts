@@ -3,6 +3,7 @@ export type ApiFailure = { error?: string; code?: string; missing?: string[] };
 export async function postJson<T>(url: string, body?: unknown): Promise<{ ok: true; data: T } | { ok: false; data: ApiFailure }> {
   const response = await fetch(url, {
     method: "POST",
+    credentials: "same-origin",
     headers: body === undefined ? undefined : { "Content-Type": "application/json" },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
@@ -10,11 +11,11 @@ export async function postJson<T>(url: string, body?: unknown): Promise<{ ok: tr
 }
 
 export async function getJson<T>(url: string) {
-  return read<T>(await fetch(url));
+  return read<T>(await fetch(url, { credentials: "same-origin" }));
 }
 
 export async function deleteJson<T>(url: string) {
-  return read<T>(await fetch(url, { method: "DELETE" }));
+  return read<T>(await fetch(url, { method: "DELETE", credentials: "same-origin" }));
 }
 
 async function read<T>(response: Response): Promise<{ ok: true; data: T } | { ok: false; data: ApiFailure }> {

@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import { createRealtimeClient } from "@neon/realtime/client";
 import { RealtimeProvider } from "@neon/realtime-react";
 import type { HostRow, TeamRow } from "@/lib/events/types";
-import { getJson } from "./api";
+import { getJson, postJson } from "./api";
 import { HomeScreen } from "./HomeScreen";
 import { InstructorDesk } from "./InstructorDesk";
+import { clearTeamResume, readTeamResume, saveTeamResume } from "./resume";
 import { TeamRoom } from "./TeamRoom";
 
 type Session = {
@@ -30,13 +31,32 @@ function EventApp() {
 
   useEffect(() => {
     let ignore = false;
-    void getJson<Session>("/api/session").then((result) => {
+    void (async () => {
+      const result = await getJson<Session>("/api/session");
       if (ignore) return;
-      const next = result.ok ? result.data : { host: null, team: null };
+      let next: Session = result.ok ? result.data : { host: null, team: null };
+
+      if (!next.team) {
+        const resume = readTeamResume();
+        if (resume) {
+          const rejoined = await postJson<{ row: TeamRow }>("/api/join", {
+            code: resume.code,
+            clientId: resume.clientId,
+          });
+          if (!ignore && rejoined.ok) {
+            saveTeamResume(resume.code, resume.clientId);
+            next = { ...next, team: { row: rejoined.data.row } };
+          } else if (!ignore && !rejoined.ok) {
+            clearTeamResume();
+          }
+        }
+      }
+
+      if (ignore) return;
       setSession(next);
       if (next.team && !next.host) setView("team");
       else setView("home");
-    });
+    })();
     return () => {
       ignore = true;
     };
@@ -54,7 +74,10 @@ function EventApp() {
         setFreshEvent(true);
         setView("instructor");
       }}
-      onJoined={() => setView("team")}
+      onJoined={(code) => {
+        if (code) saveTeamResume(code);
+        setView("team");
+      }}
       onContinueHost={
         session.host
           ? () => {

@@ -8,17 +8,9 @@ import { Logo } from "@/components/Logo";
 import { PhaseOne } from "@/components/phase1/PhaseOne";
 import { getJson, postJson } from "./api";
 import { asTeamRow } from "./rows";
+import { browserClientId, clearTeamResume, saveTeamResume } from "./resume";
 
 type LivePayload = { sealedQuery: SealedLiveQuery<TeamRow> | null; row: TeamRow };
-
-function browserId() {
-  const key = "ado-client-id";
-  const existing = window.sessionStorage.getItem(key);
-  if (existing) return existing;
-  const created = crypto.randomUUID();
-  window.sessionStorage.setItem(key, created);
-  return created;
-}
 
 export function JoinRoom({ onHome, onJoined }: { onHome: () => void; onJoined: () => void }) {
   const [code, setCode] = useState("");
@@ -28,12 +20,15 @@ export function JoinRoom({ onHome, onJoined }: { onHome: () => void; onJoined: (
   async function join() {
     setPending(true);
     setError(null);
-    const result = await postJson<LivePayload>("/api/join", { code, clientId: browserId() });
+    const clientId = browserClientId();
+    const normalized = code.trim().toUpperCase();
+    const result = await postJson<LivePayload>("/api/join", { code: normalized, clientId });
     setPending(false);
     if (!result.ok) {
       setError(result.data.error ?? "Deze code werkt niet.");
       return;
     }
+    saveTeamResume(normalized, clientId);
     onJoined();
   }
 
@@ -218,7 +213,10 @@ function TeamStage({ row, degraded, onHome }: { row: TeamRow; degraded: boolean;
 
   async function leave() {
     await postJson("/api/leave");
-    window.sessionStorage.setItem("ado-client-id", crypto.randomUUID());
+    clearTeamResume();
+    const nextId = crypto.randomUUID();
+    window.localStorage.setItem("ado-client-id", nextId);
+    window.sessionStorage.setItem("ado-client-id", nextId);
     onHome();
   }
 
