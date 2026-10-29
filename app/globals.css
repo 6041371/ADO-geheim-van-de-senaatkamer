@@ -20,6 +20,8 @@ html,
 body {
   margin: 0;
   min-height: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -28,6 +30,13 @@ body {
   background:
     radial-gradient(circle at top, rgba(0, 130, 55, 0.35), transparent 42%),
     var(--dark);
+  overflow-x: hidden;
+}
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
 }
 
 button,
@@ -40,15 +49,15 @@ button {
 }
 
 .app {
-  width: min(880px, calc(100% - 32px));
+  width: min(720px, calc(100% - 24px));
   margin: 0 auto;
-  padding: 28px 0 64px;
+  padding: 20px 0 calc(48px + env(safe-area-inset-bottom));
 }
 
 .hero {
-  width: min(560px, calc(100% - 28px));
+  width: min(520px, calc(100% - 20px));
   min-height: 100dvh;
-  padding-top: 22px;
+  padding: calc(16px + env(safe-area-inset-top)) 0 calc(28px + env(safe-area-inset-bottom));
   background:
     linear-gradient(180deg, rgba(4, 20, 12, 0.88), rgba(4, 20, 12, 0.94)),
     url("/ado/splash.jpg") center top / cover no-repeat;
@@ -685,22 +694,26 @@ p.story,
 }
 
 .mg-phone {
-  --mg-nav-h: 70px;
-  --mg-frame: 560px;
-  --mg-text: 21px;
-  --mg-text-tight: 1.55;
-  --mg-kicker-size: 16px;
-  --mg-title-size: clamp(28px, 6.5vw, 36px);
-  --mg-label-size: 17px;
-  --mg-control: 60px;
-  width: min(100%, var(--mg-frame));
+  --mg-nav-h: 64px;
+  --mg-frame: 100%;
+  --mg-scene: min(100%, 420px);
+  --mg-text: clamp(17px, 4.2vw, 20px);
+  --mg-text-tight: 1.5;
+  --mg-kicker-size: clamp(13px, 3.4vw, 15px);
+  --mg-title-size: clamp(24px, 7vw, 34px);
+  --mg-label-size: clamp(14px, 3.6vw, 16px);
+  --mg-control: clamp(52px, 12vw, 58px);
+  --mg-tag-size: clamp(12px, 3.2vw, 15px);
+  --mg-qmark-size: clamp(52px, 14vw, 68px);
+  width: min(100%, 560px);
+  max-width: 100%;
   min-height: 100dvh;
   margin: 0 auto;
   background: #080808;
   display: flex;
   flex-direction: column;
   position: relative;
-  padding-bottom: calc(var(--mg-nav-h) + 96px + env(safe-area-inset-bottom));
+  padding-bottom: calc(var(--mg-nav-h) + 88px + env(safe-area-inset-bottom));
   font-size: var(--mg-text);
   line-height: var(--mg-text-tight);
 }
@@ -885,7 +898,9 @@ p.story,
 
 .mg-meet {
   position: relative;
-  margin: 4px 0 12px;
+  width: var(--mg-scene);
+  max-width: 100%;
+  margin: 4px auto 12px;
   border-radius: 18px;
   overflow: hidden;
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
@@ -900,17 +915,18 @@ p.story,
 .mg-tag {
   position: absolute;
   z-index: 1;
-  padding: 7px 11px;
+  padding: clamp(5px, 1.6vw, 8px) clamp(8px, 2.2vw, 12px);
   border-radius: 10px;
   background: rgba(255, 248, 230, 0.96);
   color: #1a140c;
   font-family: var(--font-label), Impact, sans-serif;
-  font-size: 15px;
+  font-size: var(--mg-tag-size);
   line-height: 1.1;
   letter-spacing: 0.01em;
   text-align: center;
   text-transform: none;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35);
+  max-width: 38%;
 }
 
 .mg-tag.is-erik { top: 11%; left: 50%; transform: translateX(-50%); }
@@ -919,8 +935,8 @@ p.story,
 
 .mg-qmark {
   position: absolute;
-  width: 74px;
-  height: 74px;
+  width: var(--mg-qmark-size);
+  height: var(--mg-qmark-size);
   display: grid;
   place-items: center;
   border: 2px dashed #ffe000;
@@ -928,25 +944,19 @@ p.story,
   background: rgba(0, 0, 0, 0.28);
   color: #ffe000;
   font-family: var(--font-label), Impact, sans-serif;
-  font-size: 40px;
+  font-size: calc(var(--mg-qmark-size) * 0.52);
 }
 
 /* Lege stoel links (tussen Erik en Karin) */
 .mg-qmark.is-empty-a {
   top: 26%;
   left: 14%;
-  width: 64px;
-  height: 64px;
-  font-size: 34px;
 }
 
 /* Lege stoel rechts (tussen Erik en Tom) */
 .mg-qmark.is-empty-b {
   top: 26%;
   right: 14%;
-  width: 64px;
-  height: 64px;
-  font-size: 34px;
 }
 
 .mg-logo,
@@ -1150,7 +1160,7 @@ p.story,
   left: 50%;
   bottom: 0;
   transform: translateX(-50%);
-  width: min(100%, var(--mg-frame));
+  width: min(100%, 560px);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   background: #003b1f;
@@ -1314,7 +1324,7 @@ p.story,
   left: 50%;
   bottom: 0;
   transform: translateX(-50%);
-  width: min(100%, var(--mg-frame));
+  width: min(100%, 560px);
   max-height: 82dvh;
   overflow: auto;
   background: #071d15;
@@ -2487,10 +2497,16 @@ p.story,
 
 .d2-compare {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: 1fr;
   gap: 10px;
   align-items: stretch;
   margin: 8px 0 4px;
+}
+
+@media (min-width: 520px) {
+  .d2-compare {
+    grid-template-columns: 1fr auto 1fr;
+  }
 }
 
 .d2-compare article {
@@ -2697,44 +2713,92 @@ p.story,
   margin-top: 4px;
 }
 
-/* iPad / tablet: bredere frame, grotere tekst */
-@media (min-width: 768px) {
+/* —— Responsive system —— */
+/* Small phones */
+@media (max-width: 380px) {
   .mg-phone {
-    --mg-frame: 920px;
-    --mg-nav-h: 76px;
-    --mg-text: 24px;
-    --mg-text-tight: 1.58;
-    --mg-kicker-size: 18px;
-    --mg-title-size: clamp(34px, 4vw, 44px);
-    --mg-label-size: 19px;
-    --mg-control: 66px;
+    --mg-text: 16px;
+    --mg-title-size: 22px;
+    --mg-control: 50px;
+    --mg-nav-h: 60px;
   }
 
   .mg-menu,
   .mg-screen,
   .mg-splash {
-    padding: 28px 32px 40px;
-    gap: 18px;
+    padding: 14px 12px 24px;
+    gap: 10px;
   }
 
-  .mg-tag {
-    font-size: 17px;
-    padding: 8px 12px;
+  .mg-dev-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .d2-compare {
+    grid-template-columns: 1fr;
+  }
+
+  .d2-glass {
+    justify-self: center;
+    transform: rotate(90deg);
+  }
+}
+
+/* Large phones / small tablets */
+@media (min-width: 480px) {
+  .mg-phone {
+    width: min(100%, 520px);
+    --mg-scene: min(100%, 460px);
+  }
+
+  .mg-nav {
+    width: min(100%, 520px);
+  }
+}
+
+/* iPad portrait & tablets: leesbaarder, geen desktop-stretch */
+@media (min-width: 768px) {
+  .app {
+    width: min(760px, calc(100% - 40px));
+    padding: 28px 0 64px;
+  }
+
+  .hero {
+    width: min(560px, calc(100% - 36px));
+  }
+
+  .mg-phone {
+    width: min(100%, 640px);
+    --mg-scene: min(100%, 520px);
+    --mg-nav-h: 72px;
+    --mg-text: 21px;
+    --mg-text-tight: 1.55;
+    --mg-kicker-size: 16px;
+    --mg-title-size: clamp(30px, 3.5vw, 38px);
+    --mg-label-size: 17px;
+    --mg-control: 62px;
+    --mg-tag-size: 15px;
+    --mg-qmark-size: 64px;
+  }
+
+  .mg-nav {
+    width: min(100%, 640px);
+  }
+
+  .mg-menu,
+  .mg-screen,
+  .mg-splash {
+    padding: 26px 28px 36px;
+    gap: 16px;
   }
 
   .mg-dossiers strong,
   .mg-ending > button strong {
-    font-size: 26px;
-  }
-
-  .mg-minutes .mg-brief strong,
-  .mg-minutes .mg-answer h2,
-  .mg-minutes .mg-confirm h2 {
-    font-size: 22px;
+    font-size: 24px;
   }
 
   .mg-nav button {
-    font-size: 17px;
+    font-size: 16px;
   }
 
   .mg-screen > .mg-cta,
@@ -2743,56 +2807,110 @@ p.story,
   .mg-actions > .mg-cta,
   .mg-success > .mg-cta,
   .mg-confirm > .mg-cta,
-  .d2-screen > .mg-cta {
-    min-height: 68px;
-    font-size: 22px;
+  .d2-screen > .mg-cta,
+  .d3-screen > .mg-cta,
+  .d3-ask > .mg-cta {
+    min-height: 64px;
+    font-size: 20px;
+  }
+
+  .d2-compare {
+    grid-template-columns: 1fr auto 1fr;
   }
 
   .d2-compare article {
-    min-height: 200px;
-    padding: 22px 20px;
-  }
-
-  .d2-compare article span {
-    font-size: 18px;
-  }
-
-  .d2-compare article em {
-    font-size: 17px;
+    min-height: 180px;
+    padding: 20px 18px;
   }
 
   .d2-strips {
     grid-template-columns: 1fr 1fr;
   }
 
-  .d2-ink b {
-    font-size: 16px;
+  .d3-split {
+    grid-template-columns: 1fr 1fr;
   }
 
-  .d2-ink strong {
-    font-size: 11px;
+  .mg-dev-grid {
+    grid-template-columns: 1fr 1fr 1fr;
   }
 
-  .d2-plate b {
-    font-size: 17px;
-  }
-
-  .d2-plate strong {
-    font-size: 13px;
+  .mg-sheet,
+  .d3-zoom-card {
+    width: min(100%, 640px);
   }
 }
 
-@media (min-width: 768px) and (orientation: landscape) {
+/* Desktop / large screens: vaste speelkolom, gecentreerd */
+@media (min-width: 1024px) {
+  .mg {
+    display: grid;
+    place-items: start center;
+    background:
+      radial-gradient(circle at 50% 0%, rgba(0, 130, 55, 0.22), transparent 50%),
+      #071d15;
+  }
+
   .mg-phone {
-    --mg-frame: 1040px;
+    width: 560px;
+    --mg-scene: 480px;
+    --mg-text: 19px;
+    --mg-title-size: 32px;
+    --mg-label-size: 16px;
+    --mg-kicker-size: 15px;
+    --mg-control: 58px;
+    --mg-tag-size: 14px;
+    --mg-qmark-size: 60px;
+    min-height: 100dvh;
+    box-shadow: 0 0 0 1px rgba(255, 224, 0, 0.12), 0 24px 80px rgba(0, 0, 0, 0.45);
   }
 
-  .d2-compare {
-    gap: 18px;
+  .mg-nav {
+    width: 560px;
   }
 
-  .d3-split {
-    grid-template-columns: 1fr 1fr;
+  .mg-sheet,
+  .d3-zoom-card {
+    width: min(100%, 560px);
+  }
+
+  .app {
+    width: min(640px, calc(100% - 48px));
+  }
+
+  .hero {
+    width: min(520px, calc(100% - 48px));
+  }
+}
+
+/* Wide desktop */
+@media (min-width: 1280px) {
+  .mg-phone {
+    width: 600px;
+    --mg-scene: 500px;
+  }
+
+  .mg-nav,
+  .mg-sheet,
+  .d3-zoom-card {
+    width: 600px;
+  }
+}
+
+/* Landscape phones / short height */
+@media (max-height: 520px) and (orientation: landscape) {
+  .mg-phone {
+    --mg-nav-h: 52px;
+    padding-bottom: calc(52px + 72px + env(safe-area-inset-bottom));
+  }
+
+  .mg-polaroid img,
+  .mg-hero {
+    height: 120px;
+  }
+
+  .mg-meet {
+    max-width: 280px;
   }
 }
 
@@ -2946,6 +3064,7 @@ p.story,
 
 .d3-split {
   display: grid;
+  grid-template-columns: 1fr;
   gap: 12px;
 }
 
@@ -3014,7 +3133,7 @@ p.story,
 }
 
 .d3-zoom-card {
-  width: min(100%, var(--mg-frame));
+  width: min(100%, 560px);
   background: #0c1f16;
   border-radius: 18px 18px 0 0;
   padding: 20px 18px calc(24px + env(safe-area-inset-bottom));
