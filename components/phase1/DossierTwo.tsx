@@ -22,16 +22,27 @@ export function DossierTwo({
   onProgress,
   onMenu,
   onTask,
+  startTask,
 }: {
   phase: Phase;
   stepIndex: number;
   onProgress: (stepIndex: number, phase: Phase) => Promise<boolean>;
   onMenu: () => void;
   onTask: (task: 4 | 5 | 6) => void;
+  startTask?: 4 | 5 | 6;
 }) {
   const saved = dossier2DoneCount(phase, stepIndex);
-  const [stage, setStage] = useState<Stage>(saved >= 3 ? "ending" : saved === 0 ? "intro" : "task");
-  const [task, setTask] = useState<4 | 5 | 6>(saved >= 2 ? 6 : saved === 1 ? 5 : 4);
+  const [stage, setStage] = useState<Stage>(() => {
+    if (saved >= 3) return "ending";
+    if (startTask) return "task";
+    return saved === 0 ? "intro" : "task";
+  });
+  const [task, setTask] = useState<4 | 5 | 6>(() => {
+    if (startTask) return startTask;
+    if (saved >= 2) return 6;
+    if (saved === 1) return 5;
+    return 4;
+  });
 
   useEffect(() => {
     onTask(task);
@@ -492,13 +503,15 @@ function CompareTask({
     <section className="mg-screen d2-screen">
       <Bar kicker="Dossier 02" title="Opdracht 6" step={2} onBack={onBack} />
       <h2>Het ontbrekende document</h2>
-      <div className="d2-compare">
+      <div className="d2-compare" aria-label="Vergelijk interne versie met persversie">
         <article>
           <span>Interne versie</span>
+          <em>Volledig stadiondossier · SD-2023-10 · alleen voor bestuur</em>
         </article>
         <i className="d2-glass" aria-hidden="true" />
         <article>
           <span>Persversie</span>
+          <em>Goedgekeurde conceptpersverklaring · beperkte openbare inhoud</em>
         </article>
       </div>
       <p className="mg-note">De interne stadionplannen bevatten meer informatie dan de documenten die voor de pers bedoeld waren. Vergelijk de fysieke documenten en ontdek welke gegevens bewust niet openbaar mochten worden gemaakt.</p>

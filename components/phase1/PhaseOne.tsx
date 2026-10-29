@@ -36,6 +36,7 @@ export function PhaseOne({
   const [screen, setScreen] = useState<Screen>(openingScreen(phase, stepIndex));
   const [taskIndex, setTaskIndex] = useState(Math.min(completed, 2));
   const [dossierTask, setDossierTask] = useState<4 | 5 | 6>(4);
+  const [forcedDossierTask, setForcedDossierTask] = useState<4 | 5 | 6 | null>(null);
   const [panel, setPanel] = useState<"hints" | "evidence" | null>(null);
   const [hintLevel, setHintLevel] = useState(0);
   const [banner, setBanner] = useState<string | null>(null);
@@ -74,6 +75,7 @@ export function PhaseOne({
         return;
       }
       setBanner(null);
+      setForcedDossierTask(null);
       setScreen(dossier2Done ? "dossier2end" : "dossier2");
       return;
     }
@@ -119,6 +121,18 @@ export function PhaseOne({
     setScreen("menu");
   }
 
+  async function jumpTo(target: JumpTarget) {
+    setBanner(null);
+    setPanel(null);
+    setHintLevel(0);
+    const saved = await onProgress(target.step, target.phase);
+    if (!saved) return;
+    setTaskIndex(target.taskIndex);
+    setDossierTask(target.dossierTask);
+    setForcedDossierTask(target.screen === "dossier2" ? target.dossierTask : null);
+    setScreen(target.screen);
+  }
+
   if (!introSeen || replay) return <IntroFilm onDone={finishIntro} />;
 
   const hint = screen === "dossier2" || screen === "dossier2end" ? DOSSIER2_HINTS[dossierTask] : (TASK_HINTS[taskIndex] ?? HINTS.attendance);
@@ -151,6 +165,17 @@ export function PhaseOne({
             <button className="mg-ghost mg-cta" type="button" onClick={() => void replayLevels()}>
               Tijdelijk: levels opnieuw
             </button>
+            <details className="mg-dev">
+              <summary>Test: spring naar opdracht</summary>
+              <div className="mg-dev-grid">
+                {JUMPS.map((item) => (
+                  <button key={item.id} type="button" onClick={() => void jumpTo(item)}>
+                    <strong>{item.label}</strong>
+                    {item.detail}
+                  </button>
+                ))}
+              </div>
+            </details>
             <div className="mg-dossiers">
               {DOSSIERS.filter((dossier) => dossier.id > 1).map((dossier) => {
                 const status = dossierStatus(dossier.id, dossier1Done, dossier2Done);
@@ -195,9 +220,26 @@ export function PhaseOne({
         ) : null}
 
         {screen === "dossier2" ? (
-          <DossierTwo phase={phase} stepIndex={stepIndex} onProgress={onProgress} onMenu={() => setScreen("menu")} onTask={rememberTask} />
+          <DossierTwo
+            key={`d2-${stepIndex}-${forcedDossierTask ?? "flow"}`}
+            phase={phase}
+            stepIndex={stepIndex}
+            onProgress={onProgress}
+            onMenu={() => setScreen("menu")}
+            onTask={rememberTask}
+            startTask={forcedDossierTask ?? undefined}
+          />
         ) : null}
-        {screen === "dossier2end" ? <DossierTwo phase={phase} stepIndex={stepIndex} onProgress={onProgress} onMenu={() => setScreen("menu")} onTask={rememberTask} /> : null}
+        {screen === "dossier2end" ? (
+          <DossierTwo
+            key={`d2-end-${stepIndex}`}
+            phase={phase}
+            stepIndex={stepIndex}
+            onProgress={onProgress}
+            onMenu={() => setScreen("menu")}
+            onTask={rememberTask}
+          />
+        ) : null}
 
         {screen === "ending" ? (
           <section className="mg-screen mg-ending">
@@ -309,3 +351,25 @@ function dossierStatus(id: number, dossier1Done: boolean, dossier2Done: boolean)
   if (id === 3 && dossier2Done) return "Ontgrendeld";
   return "Vergrendeld";
 }
+
+type JumpTarget = {
+  id: string;
+  label: string;
+  detail: string;
+  screen: Screen;
+  taskIndex: number;
+  dossierTask: 4 | 5 | 6;
+  step: number;
+  phase: Phase;
+};
+
+const JUMPS: JumpTarget[] = [
+  { id: "d1-1", label: "Dossier 01 · 1", detail: "Wie was aanwezig?", screen: "task", taskIndex: 0, dossierTask: 4, step: 0, phase: "playing" },
+  { id: "d1-2", label: "Dossier 01 · 2", detail: "Ontbrekende notulen", screen: "task", taskIndex: 1, dossierTask: 4, step: 1, phase: "playing" },
+  { id: "d1-3", label: "Dossier 01 · 3", detail: "Verborgen tijdcode", screen: "task", taskIndex: 2, dossierTask: 4, step: 2, phase: "playing" },
+  { id: "d1-end", label: "Dossier 01 · eind", detail: "Overzicht bewijs", screen: "ending", taskIndex: 2, dossierTask: 4, step: 2, phase: "done" },
+  { id: "d2-4", label: "Dossier 02 · 4", detail: "Vergelijk documenten", screen: "dossier2", taskIndex: 2, dossierTask: 4, step: 2, phase: "done" },
+  { id: "d2-5", label: "Dossier 02 · 5", detail: "Toegangsarchief", screen: "dossier2", taskIndex: 2, dossierTask: 5, step: 3, phase: "playing" },
+  { id: "d2-6", label: "Dossier 02 · 6", detail: "Ontbrekende document", screen: "dossier2", taskIndex: 2, dossierTask: 6, step: 4, phase: "playing" },
+  { id: "d2-end", label: "Dossier 02 · eind", detail: "Dossier gesloten", screen: "dossier2end", taskIndex: 2, dossierTask: 6, step: 5, phase: "done" },
+];
