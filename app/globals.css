@@ -3069,3 +3069,119 @@ p.story,
   color: #fff;
   border: 1px solid rgba(255, 224, 0, 0.28);
 }
+
+.d3-timer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #0c1f16;
+  border: 1px solid rgba(255, 224, 0, 0.35);
+  font-family: var(--font-label), Impact, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.d3-timer span {
+  color: #ffe000;
+  font-size: 14px;
+}
+
+.d3-timer strong {
+  font-size: 28px;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.d3-timer.is-low strong {
+  color: #ffe000;
+}
+
+.d3-timer.is-out {
+  border-color: #c45b4a;
+}
+
+.d3-timer.is-out strong {
+  color: #ffd0c8;
+}
+
+.d3-memory {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.d3-mem-card {
+  position: relative;
+  min-height: 92px;
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  perspective: 800px;
+  background: transparent;
+}
+
+.d3-mem-back,
+.d3-mem-front {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 12px;
+  border-radius: 14px;
+  backface-visibility: hidden;
+  transition: transform 0.35s ease;
+  text-align: center;
+  line-height: 1.25;
+}
+
+.d3-mem-back {
+  background: linear-gradient(160deg, #004d28, #003b1f 55%, #071d15);
+  color: #ffe000;
+  font-family: var(--font-label), Impact, sans-serif;
+  letter-spacing: 0.12em;
+  font-size: 18px;
+  border: 1px solid rgba(255, 224, 0, 0.35);
+}
+
+.d3-mem-front {
+  background: #f3e8d0;
+  color: #1a2418;
+  font-size: 15px;
+  font-weight: 700;
+  transform: rotateY(180deg);
+  border: 1px solid rgba(26, 36, 24, 0.18);
+}
+
+.d3-mem-card.is-open .d3-mem-back {
+  transform: rotateY(180deg);
+}
+
+.d3-mem-card.is-open .d3-mem-front {
+  transform: rotateY(0deg);
+}
+
+.d3-mem-card.is-matched .d3-mem-front {
+  background: #ffe000;
+  box-shadow: 0 0 0 2px #003b1f;
+}
+
+.d3-mem-card:disabled {
+  opacity: 1;
+}
+
+@media (min-width: 768px) {
+  .d3-memory {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .d3-mem-card {
+    min-height: 110px;
+  }
+
+  .d3-mem-front {
+    font-size: 17px;
+  }
+}

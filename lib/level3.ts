@@ -12,9 +12,9 @@ export const DOSSIER3_HINTS: Record<7 | 8 | 9, HintSet> = {
     hint2: "Het embargo betekent: geen externe publicatie vóór een definitief besluit.",
   },
   9: {
-    props: "Pak het Haags Dagblad en de conceptpersverklaring.",
-    hint1: "Het artikel bevat details die niet in de goedgekeurde persverklaring stonden.",
-    hint2: "Die details komen uit het vertrouwelijke stadiondossier.",
+    props: "Pak het Haags Dagblad en de conceptpersverklaring. Speel daarna de memory binnen 60 seconden.",
+    hint1: "Koppel elk gelekt detail aan waar het thuishoort: intern dossier of te vroege publicatie.",
+    hint2: "Financiën, techniek en locatieopties stonden niet in de goedgekeurde persverklaring.",
   },
 };
 
@@ -52,3 +52,47 @@ export const LEAK_CHOICES = [
 ] as const;
 
 export const LEAK_CORRECT = "dossier";
+
+/** Memory: koppel gelekte details aan hun bron. 60 seconden. */
+export const MEMORY_SECONDS = 60;
+
+export const MEMORY_PAIRS = [
+  {
+    pairId: "finance",
+    a: "Financiële ramingen",
+    b: "Alleen in het interne dossier",
+  },
+  {
+    pairId: "tech",
+    a: "Technische details",
+    b: "Niet in de persverklaring",
+  },
+  {
+    pairId: "location",
+    a: "Locatieopties",
+    b: "Gelekt in Haags Dagblad",
+  },
+  {
+    pairId: "embargo",
+    a: "Embargo geschonden",
+    b: "Vóór officiële vrijgave",
+  },
+] as const;
+
+export type MemoryCard = {
+  id: string;
+  pairId: string;
+  label: string;
+};
+
+export function buildMemoryDeck(): MemoryCard[] {
+  const cards: MemoryCard[] = MEMORY_PAIRS.flatMap((pair) => [
+    { id: `${pair.pairId}-a`, pairId: pair.pairId, label: pair.a },
+    { id: `${pair.pairId}-b`, pairId: pair.pairId, label: pair.b },
+  ]);
+  for (let i = cards.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [cards[i], cards[j]] = [cards[j], cards[i]];
+  }
+  return cards;
+}

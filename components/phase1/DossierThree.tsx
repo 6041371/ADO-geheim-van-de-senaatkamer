@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  LEAK_CHOICES,
   LEAK_CORRECT,
+  MEMORY_SECONDS,
   PRESS_KEYWORDS,
   PROTOCOL_CHOICES,
   PROTOCOL_CORRECT,
+  buildMemoryDeck,
+  type MemoryCard,
 } from "@/lib/level3";
 import { playCorrect, playDenied } from "./sounds";
 
@@ -289,71 +291,132 @@ function ProtocolTask({ onBack, onNext }: { onBack: () => void; onNext: () => vo
 }
 
 function LeakTask({ onBack, onFinished }: { onBack: () => void; onFinished: () => void }) {
-  const [choice, setChoice] = useState<string | null>(null);
-  const [wrong, setWrong] = useState(false);
-  const [correct, setCorrect] = useState(false);
+  const [deck, setDeck] = useState<MemoryCard[]>(() => buildMemoryDeck());
+  const [flipped, setFlipped] = useState<string[]>([]);
+  const [matched, setMatched] = useState<string[]>([]);
+  const [lock, setLock] = useState(false);
+  const [seconds, setSeconds] = useState(MEMORY_SECONDS);
+  const [running, setRunning] = useState(false);
+  const [timedOut, setTimedOut] = useState(false);
+  const [won, setWon] = useState(false);
 
-  function check() {
-    if (!choice) return;
-    if (choice === LEAK_CORRECT) {
-      setWrong(false);
-      setCorrect(true);
-      playCorrect();
+  const done = matched.length === deck.length;
+
+  useEffect(() => {
+    if (!running || won || timedOut) return;
+    if (seconds <= 0) {
+      setTimedOut(true);
+      setRunning(false);
+      playDenied();
       return;
     }
-    setWrong(true);
-    playDenied();
+    const timer = window.setTimeout(() => setSeconds((value) => value - 1), 1000);
+    return () => window.clearTimeout(timer);
+  }, [running, seconds, won, timedOut]);
+
+  useEffect(() => {
+    if (!done || won) return;
+    setWon(true);
+    setRunning(false);
+    playCorrect();
+  }, [done, won]);
+
+  function restart() {
+    setDeck(buildMemoryDeck());
+    setFlipped([]);
+    setMatched([]);
+    setLock(false);
+    setSeconds(MEMORY_SECONDS);
+    setTimedOut(false);
+    setWon(false);
+    setRunning(true);
   }
+
+  function flip(card: MemoryCard) {
+    if (!running || lock || timedOut || won) return;
+    if (flipped.includes(card.id) || matched.includes(card.id)) return;
+    if (flipped.length >= 2) return;
+
+    const next = [...flipped, card.id];
+    setFlipped(next);
+    if (next.length < 2) return;
+
+    const [firstId, secondId] = next;
+    const first = deck.find((item) => item.id === firstId);
+    const second = deck.find((item) => item.id === secondId);
+    if (!first || !second) return;
+
+    setLock(true);
+    if (first.pairId === second.pairId) {
+      window.setTimeout(() => {
+        setMatched((current) => [...current, firstId, secondId]);
+        setFlipped([]);
+        setLock(false);
+        playCorrect();
+      }, 320);
+      return;
+    }
+
+    window.setTimeout(() => {
+      setFlipped([]);
+      setLock(false);
+      playDenied();
+    }, 700);
+  }
+
+  const clock = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
 
   return (
     <section className="mg-screen d3-screen">
       <Bar kicker="Dossier 03 · Opdracht 9" title="Wat werd er gelekt?" step={2} onBack={onBack} />
       <p className="mg-note">
-        De volgende ochtend stond er een nieuwsartikel met specifieke informatie over de stadionontwikkeling. Die details stonden niet in de goedgekeurde persverklaring.
+        Memory: koppel elk gelekt detail aan de juiste bron. Zo bewijs je dat de informatie uit het vertrouwelijke stadiondossier kwam — niet uit de goedgekeurde persverklaring.
       </p>
 
-      <article className="d3-paper">
-        <header>
-          <span>Haags Dagblad · Analyse</span>
-          <strong className="d3-stamp-red is-warn">Lek?</strong>
-        </header>
-        <h3>Details wijken af van de officiële verklaring</h3>
-        <p>
-          Het bericht bevat technische en financiële informatie die alleen in het vertrouwelijke stadiondossier voorkomt — niet in de conceptpersverklaring.
-        </p>
-      </article>
-
-      <div className="d3-ask">
-        <p className="mg-kicker">Bron van het lek</p>
-        <p>Waar kwam de gelekte informatie vandaan?</p>
-        <div className="d3-choices">
-          {LEAK_CHOICES.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className={choice === item.id ? "is-on" : ""}
-              onClick={() => {
-                setChoice(item.id);
-                setWrong(false);
-              }}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-        {wrong ? <p className="mg-bad">Het nieuws bevatte details die niet in de goedgekeurde verklaring stonden.</p> : null}
-        {!correct ? (
-          <button className="mg-yellow mg-cta" type="button" disabled={!choice} onClick={check}>
-            Controleer antwoord
-          </button>
-        ) : null}
+      <div className={`d3-timer ${seconds <= 10 && running ? "is-low" : ""} ${timedOut ? "is-out" : ""}`}>
+        <span>Countdown</span>
+        <strong>{timedOut ? "00:00" : clock}</strong>
       </div>
 
-      {correct ? (
+      {!running && !won && !timedOut ? (
+        <button className="mg-yellow mg-cta" type="button" onClick={() => setRunning(true)}>
+          Start memory (60 seconden)
+        </button>
+      ) : null}
+
+      <div className="d3-memory" aria-label="Memorykaarten">
+        {deck.map((card) => {
+          const open = flipped.includes(card.id) || matched.includes(card.id);
+          return (
+            <button
+              key={card.id}
+              type="button"
+              className={`d3-mem-card ${open ? "is-open" : ""} ${matched.includes(card.id) ? "is-matched" : ""}`}
+              onClick={() => flip(card)}
+              disabled={!running || timedOut || won || lock}
+            >
+              <span className="d3-mem-back">ADO</span>
+              <span className="d3-mem-front">{card.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {timedOut && !won ? (
+        <div className="mg-bad">
+          <strong>Tijd voorbij</strong>
+          <p>De 60 seconden zijn om. Probeer opnieuw om de gelekte details te koppelen.</p>
+          <button className="mg-yellow mg-cta" type="button" onClick={restart}>
+            Opnieuw (60s)
+          </button>
+        </div>
+      ) : null}
+
+      {won ? (
         <div className="mg-success">
-          <p className="mg-kicker">Dossier 03 afgerond</p>
+          <p className="mg-kicker">Lek bewezen · bron: {LEAK_CORRECT === "dossier" ? "vertrouwelijk dossier" : LEAK_CORRECT}</p>
           <p>
-            De vertrouwelijke stadioninformatie is vóór het afgesproken moment in de media verschenen. Open dossier 04: Het lek.
+            De gelekte details horen bij het vertrouwelijke stadiondossier en stonden niet in de goedgekeurde persverklaring. Het embargo is geschonden. Open dossier 04: Het lek.
           </p>
           <button className="mg-yellow mg-cta" type="button" onClick={onFinished}>
             Terug naar dossiers
