@@ -1,21 +1,24 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useState } from "react";
-import { COMING_SOON, DOSSIERS, EVIDENCE, HINTS, LOCKED_MESSAGE, completedTasks, type HintSet } from "@/lib/level1";
+import { DOSSIERS, EVIDENCE, HINTS, LOCKED_MESSAGE, completedTasks, type HintSet } from "@/lib/level1";
 import { DOSSIER2_EVIDENCE, DOSSIER2_HINTS, dossier1Complete, dossier2Complete, dossier2DoneCount } from "@/lib/level2";
 import type { Phase } from "@/lib/events/types";
+import { ALL_JUMPS, firstWalkStepForLevel, type GameScreen, type JumpTarget } from "@/lib/walkthrough-jumps";
 import { Logo } from "@/components/Logo";
+import { Walkthrough } from "@/components/Walkthrough";
 import { DossierTwo } from "./DossierTwo";
 import { IntroFilm } from "./IntroFilm";
 import { AttendanceTask, MinutesTask, RoomBriefing, TimeTask } from "./Tasks";
 
-type Screen = "menu" | "briefing" | "task" | "ending" | "dossier2" | "dossier2end";
+type Screen = GameScreen;
 
 type StoredView = {
   screen: Screen;
   taskIndex: number;
   dossierTask: 4 | 5 | 6;
   forcedDossierTask: 4 | 5 | 6 | null;
+  walkStep: number;
 };
 
 const TASK_HINTS: HintSet[] = [HINTS.attendance, HINTS.minutes, HINTS.time];
@@ -48,6 +51,8 @@ export function PhaseOne({
   const [taskIndex, setTaskIndex] = useState(fallback.taskIndex);
   const [dossierTask, setDossierTask] = useState<4 | 5 | 6>(fallback.dossierTask);
   const [forcedDossierTask, setForcedDossierTask] = useState<4 | 5 | 6 | null>(fallback.forcedDossierTask);
+  const [walkStep, setWalkStep] = useState(fallback.walkStep);
+  const [startedAt] = useState(() => Date.now());
   const [panel, setPanel] = useState<"hints" | "evidence" | "jumps" | null>(null);
   const [hintLevel, setHintLevel] = useState(0);
   const [banner, setBanner] = useState<string | null>(null);
@@ -60,6 +65,7 @@ export function PhaseOne({
     setTaskIndex(restored.taskIndex);
     setDossierTask(restored.dossierTask);
     setForcedDossierTask(restored.forcedDossierTask);
+    setWalkStep(restored.walkStep);
     if (phase !== "intro") setIntroSeen(true);
     else setIntroSeen(window.localStorage.getItem(introKey(teamId)) === "1" || window.sessionStorage.getItem("ado-intro-seen") === "1");
     setReady(true);
@@ -69,8 +75,8 @@ export function PhaseOne({
 
   useEffect(() => {
     if (!ready) return;
-    saveView(teamId, { screen, taskIndex, dossierTask, forcedDossierTask });
-  }, [ready, teamId, screen, taskIndex, dossierTask, forcedDossierTask]);
+    saveView(teamId, { screen, taskIndex, dossierTask, forcedDossierTask, walkStep });
+  }, [ready, teamId, screen, taskIndex, dossierTask, forcedDossierTask, walkStep]);
 
   const hintKey = screen === "dossier2" || screen === "dossier2end" ? `d2-${dossierTask}` : String(taskIndex);
 
@@ -93,6 +99,13 @@ export function PhaseOne({
   }
 
   async function openDossier(id: number) {
+    if (id >= 3) {
+      setBanner(null);
+      setForcedDossierTask(null);
+      setWalkStep(firstWalkStepForLevel(id));
+      setScreen("walkthrough");
+      return;
+    }
     if (id === 2) {
       if (!dossier1Done) {
         setBanner(LOCKED_MESSAGE);
@@ -101,10 +114,6 @@ export function PhaseOne({
       setBanner(null);
       setForcedDossierTask(null);
       setScreen(dossier2Done ? "dossier2end" : "dossier2");
-      return;
-    }
-    if (id === 3 && dossier2Done) {
-      setBanner(COMING_SOON);
       return;
     }
     if (id !== 1) {
@@ -142,6 +151,7 @@ export function PhaseOne({
     setForcedDossierTask(null);
     setTaskIndex(0);
     setDossierTask(4);
+    setWalkStep(0);
     setHintLevel(0);
     setPanel(null);
     setBanner(null);
@@ -165,6 +175,7 @@ export function PhaseOne({
     setTaskIndex(target.taskIndex);
     setDossierTask(target.dossierTask);
     setForcedDossierTask(target.screen === "dossier2" ? target.dossierTask : null);
+    if (typeof target.walkStep === "number") setWalkStep(target.walkStep);
     setScreen(target.screen);
   }
 
@@ -205,7 +216,7 @@ export function PhaseOne({
               <p className="mg-kicker">Test: spring naar opdracht</p>
               <p className="mg-dev-note">Kies een opdracht. Werkt ook als je nog niet zo ver bent.</p>
               <div className="mg-dev-grid">
-                {JUMPS.map((item) => (
+                {ALL_JUMPS.map((item) => (
                   <button key={item.id} type="button" onClick={() => void jumpTo(item)}>
                     <strong>{item.label}</strong>
                     {item.detail}
@@ -217,7 +228,12 @@ export function PhaseOne({
               {DOSSIERS.filter((dossier) => dossier.id > 1).map((dossier) => {
                 const status = dossierStatus(dossier.id, dossier1Done, dossier2Done);
                 return (
-                  <button key={dossier.id} type="button" className={status === "Vergrendeld" ? "is-locked" : "is-ready"} onClick={() => void openDossier(dossier.id)}>
+                  <button
+                    key={dossier.id}
+                    type="button"
+                    className={status === "Vergrendeld" ? "is-locked" : "is-ready"}
+                    onClick={() => void openDossier(dossier.id)}
+                  >
                     <span>Dossier {dossier.code}</span>
                     <strong>{dossier.title}</strong>
                     <em>{status}</em>
@@ -276,6 +292,12 @@ export function PhaseOne({
             onMenu={() => setScreen("menu")}
             onTask={rememberTask}
           />
+        ) : null}
+
+        {screen === "walkthrough" ? (
+          <section className="mg-walk">
+            <Walkthrough startedAt={startedAt} stepIndex={walkStep} onStepIndex={setWalkStep} />
+          </section>
         ) : null}
 
         {screen === "ending" ? (
@@ -337,7 +359,7 @@ export function PhaseOne({
             {panel === "hints" ? (
               <>
                 <h2>Onderzoeksassistent</h2>
-                {screen === "menu" || screen === "ending" || screen === "dossier2end" ? (
+                {screen === "menu" || screen === "ending" || screen === "dossier2end" || screen === "walkthrough" ? (
                   <p>Open een opdracht. De assistent helpt alleen bij de puzzel die openstaat.</p>
                 ) : (
                   <>
@@ -369,9 +391,9 @@ export function PhaseOne({
             {panel === "jumps" ? (
               <>
                 <h2>Test: levels</h2>
-                <p>Spring direct naar een opdracht. Beschikbaar in deze build: dossier 01 en 02.</p>
+                <p>Spring direct naar elke opdracht in dossier 01 t/m 05.</p>
                 <div className="mg-dev-grid">
-                  {JUMPS.map((item) => (
+                  {ALL_JUMPS.map((item) => (
                     <button
                       key={item.id}
                       type="button"
@@ -407,23 +429,24 @@ function introKey(teamId: string) {
 
 function defaultView(phase: Phase, stepIndex: number, completed: number): StoredView {
   if (dossier2Complete(phase, stepIndex)) {
-    return { screen: "dossier2end", taskIndex: 2, dossierTask: 6, forcedDossierTask: null };
+    return { screen: "dossier2end", taskIndex: 2, dossierTask: 6, forcedDossierTask: null, walkStep: 0 };
   }
   if (phase === "playing" && stepIndex >= 3) {
     const dossierTask = (stepIndex >= 4 ? 6 : 5) as 4 | 5 | 6;
-    return { screen: "dossier2", taskIndex: 2, dossierTask, forcedDossierTask: dossierTask };
+    return { screen: "dossier2", taskIndex: 2, dossierTask, forcedDossierTask: dossierTask, walkStep: 0 };
   }
   if (phase === "done") {
-    return { screen: "ending", taskIndex: 2, dossierTask: 4, forcedDossierTask: null };
+    return { screen: "ending", taskIndex: 2, dossierTask: 4, forcedDossierTask: null, walkStep: 0 };
   }
   if (phase === "intro") {
-    return { screen: "menu", taskIndex: 0, dossierTask: 4, forcedDossierTask: null };
+    return { screen: "menu", taskIndex: 0, dossierTask: 4, forcedDossierTask: null, walkStep: 0 };
   }
   return {
     screen: "task",
     taskIndex: Math.min(completed, 2),
     dossierTask: 4,
     forcedDossierTask: null,
+    walkStep: 0,
   };
 }
 
@@ -436,6 +459,12 @@ function restoreView(teamId: string, phase: Phase, stepIndex: number, completed:
     const screen = stored.screen;
     if (!screen || !isScreen(screen)) return fallback;
 
+    const walkStep = typeof stored.walkStep === "number" ? Math.max(0, stored.walkStep) : 0;
+
+    if (screen === "walkthrough") {
+      return { screen: "walkthrough", taskIndex: 2, dossierTask: 6, forcedDossierTask: null, walkStep };
+    }
+
     if (screen === "dossier2" || screen === "dossier2end") {
       if (!dossier1Complete(phase, stepIndex)) return fallback;
       if (screen === "dossier2end" && !dossier2Complete(phase, stepIndex)) {
@@ -447,12 +476,13 @@ function restoreView(teamId: string, phase: Phase, stepIndex: number, completed:
         taskIndex: 2,
         dossierTask,
         forcedDossierTask: screen === "dossier2" ? dossierTask : null,
+        walkStep,
       };
     }
 
     if (screen === "ending") {
       if (!dossier1Complete(phase, stepIndex)) return fallback;
-      return { screen: "ending", taskIndex: 2, dossierTask: 4, forcedDossierTask: null };
+      return { screen: "ending", taskIndex: 2, dossierTask: 4, forcedDossierTask: null, walkStep };
     }
 
     if (screen === "task" || screen === "briefing") {
@@ -465,10 +495,11 @@ function restoreView(teamId: string, phase: Phase, stepIndex: number, completed:
         taskIndex,
         dossierTask: 4,
         forcedDossierTask: null,
+        walkStep,
       };
     }
 
-    if (screen === "menu") return { ...fallback, screen: "menu", forcedDossierTask: null };
+    if (screen === "menu") return { ...fallback, screen: "menu", forcedDossierTask: null, walkStep };
   } catch {
     return fallback;
   }
@@ -480,7 +511,15 @@ function saveView(teamId: string, view: StoredView) {
 }
 
 function isScreen(value: string): value is Screen {
-  return value === "menu" || value === "briefing" || value === "task" || value === "ending" || value === "dossier2" || value === "dossier2end";
+  return (
+    value === "menu" ||
+    value === "briefing" ||
+    value === "task" ||
+    value === "ending" ||
+    value === "dossier2" ||
+    value === "dossier2end" ||
+    value === "walkthrough"
+  );
 }
 
 function isDossierTask(value: unknown): value is 4 | 5 | 6 {
@@ -491,29 +530,8 @@ function dossierStatus(id: number, dossier1Done: boolean, dossier2Done: boolean)
   if (id === 2) {
     if (dossier2Done) return "Voltooid";
     if (dossier1Done) return "Ontgrendeld";
+    return "Vergrendeld";
   }
-  if (id === 3 && dossier2Done) return "Ontgrendeld";
+  if (id >= 3) return "Test · open";
   return "Vergrendeld";
 }
-
-type JumpTarget = {
-  id: string;
-  label: string;
-  detail: string;
-  screen: Screen;
-  taskIndex: number;
-  dossierTask: 4 | 5 | 6;
-  step: number;
-  phase: Phase;
-};
-
-const JUMPS: JumpTarget[] = [
-  { id: "d1-1", label: "Dossier 01 · 1", detail: "Wie was aanwezig?", screen: "task", taskIndex: 0, dossierTask: 4, step: 0, phase: "playing" },
-  { id: "d1-2", label: "Dossier 01 · 2", detail: "Ontbrekende notulen", screen: "task", taskIndex: 1, dossierTask: 4, step: 1, phase: "playing" },
-  { id: "d1-3", label: "Dossier 01 · 3", detail: "Verborgen tijdcode", screen: "task", taskIndex: 2, dossierTask: 4, step: 2, phase: "playing" },
-  { id: "d1-end", label: "Dossier 01 · eind", detail: "Overzicht bewijs", screen: "ending", taskIndex: 2, dossierTask: 4, step: 2, phase: "done" },
-  { id: "d2-4", label: "Dossier 02 · 4", detail: "Vergelijk documenten", screen: "dossier2", taskIndex: 2, dossierTask: 4, step: 2, phase: "done" },
-  { id: "d2-5", label: "Dossier 02 · 5", detail: "Toegangsarchief", screen: "dossier2", taskIndex: 2, dossierTask: 5, step: 3, phase: "playing" },
-  { id: "d2-6", label: "Dossier 02 · 6", detail: "Ontbrekende document", screen: "dossier2", taskIndex: 2, dossierTask: 6, step: 4, phase: "playing" },
-  { id: "d2-end", label: "Dossier 02 · eind", detail: "Dossier gesloten", screen: "dossier2end", taskIndex: 2, dossierTask: 6, step: 5, phase: "done" },
-];
