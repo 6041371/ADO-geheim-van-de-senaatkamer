@@ -685,8 +685,14 @@ p.story,
 }
 
 .mg-phone {
-  --mg-nav-h: 62px;
+  --mg-nav-h: 66px;
   --mg-frame: 520px;
+  --mg-text: 19px;
+  --mg-text-tight: 1.55;
+  --mg-kicker-size: 15px;
+  --mg-title-size: clamp(26px, 6.2vw, 34px);
+  --mg-label-size: 16px;
+  --mg-control: 56px;
   width: min(100%, var(--mg-frame));
   min-height: 100dvh;
   margin: 0 auto;
@@ -694,13 +700,18 @@ p.story,
   display: flex;
   flex-direction: column;
   position: relative;
-  padding-bottom: calc(var(--mg-nav-h) + 88px + env(safe-area-inset-bottom));
+  padding-bottom: calc(var(--mg-nav-h) + 96px + env(safe-area-inset-bottom));
+  font-size: var(--mg-text);
+  line-height: var(--mg-text-tight);
 }
 
 .mg-menu,
 .mg-screen,
 .mg-splash {
-  padding: 18px 16px 28px;
+  padding: 20px 18px 32px;
+  display: grid;
+  gap: 14px;
+  align-content: start;
 }
 
 .mg-splash {
@@ -718,21 +729,23 @@ p.story,
 .mg-sub {
   width: 100%;
   margin: 0 auto;
-  max-width: 24em;
+  max-width: 28em;
   color: #d7d0bc;
-  font-size: 13px;
-  letter-spacing: 0.14em;
+  font-size: var(--mg-label-size);
+  letter-spacing: 0.1em;
+  line-height: 1.45;
   text-align: center;
   text-transform: uppercase;
 }
 
 .mg-badge {
   display: inline-block;
-  margin: 16px 0;
-  padding: 7px 12px;
+  margin: 8px 0;
+  padding: 9px 14px;
   background: #ffe000;
   color: #080808;
   font-family: var(--font-label), Impact, sans-serif;
+  font-size: var(--mg-label-size);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -768,32 +781,33 @@ p.story,
 
 .mg-bar {
   display: grid;
-  grid-template-columns: 36px 1fr auto;
-  gap: 8px;
+  grid-template-columns: 40px 1fr auto;
+  gap: 10px;
   align-items: center;
-  margin-bottom: 12px;
+  margin: 0;
   text-align: left;
 }
 
 .mg-bar h1 {
   margin: 0;
-  font-size: clamp(22px, 6vw, 30px);
+  font-size: var(--mg-title-size);
+  line-height: 1.05;
 }
 
 .mg-back {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   padding: 0;
   border: 0;
   background: transparent;
   color: #ffe000;
-  font-size: 34px;
+  font-size: 38px;
   line-height: 1;
 }
 
 .mg-step {
   color: #cfc6b0;
-  font-size: 12px;
+  font-size: var(--mg-label-size);
   text-align: right;
 }
 
@@ -823,8 +837,8 @@ p.story,
 }
 
 .mg-block {
-  margin: 0 0 12px;
-  padding: 16px;
+  margin: 0;
+  padding: 18px 18px 20px;
   background: #0c1f16;
   border-radius: 16px;
 }
@@ -833,35 +847,38 @@ p.story,
 .mg-note,
 .mg-answer p,
 .mg-success p,
-.d2-screen > p {
-  font-size: 17px;
-  line-height: 1.55;
+.mg-screen > p,
+.d2-screen > p,
+.mg-brief p {
+  font-size: var(--mg-text);
+  line-height: var(--mg-text-tight);
 }
 
 .mg-note {
   display: flex;
-  gap: 10px;
-  margin: 12px 0;
-  padding: 12px 14px;
+  gap: 12px;
+  margin: 0;
+  padding: 16px 16px 18px;
   background: #10281c;
-  border-radius: 12px;
+  border-radius: 14px;
 }
 
 .mg-note::before {
   content: "i";
-  flex: 0 0 22px;
-  width: 22px;
-  height: 22px;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
   border-radius: 99px;
   background: #ffe000;
   color: #080808;
   font-family: var(--font-label), Impact, sans-serif;
+  font-size: 16px;
   text-align: center;
-  line-height: 22px;
+  line-height: 28px;
 }
 
 .mg-meet-screen .mg-bar h1 {
-  font-size: 22px;
+  font-size: var(--mg-title-size);
   line-height: 1.05;
   margin: 0;
 }
@@ -883,13 +900,13 @@ p.story,
 .mg-tag {
   position: absolute;
   z-index: 1;
-  padding: 4px 8px;
-  border-radius: 8px;
-  background: rgba(255, 248, 230, 0.95);
+  padding: 7px 11px;
+  border-radius: 10px;
+  background: rgba(255, 248, 230, 0.96);
   color: #1a140c;
   font-family: var(--font-label), Impact, sans-serif;
-  font-size: 12px;
-  line-height: 1.05;
+  font-size: 15px;
+  line-height: 1.1;
   letter-spacing: 0.01em;
   text-align: center;
   text-transform: none;
@@ -945,9 +962,13 @@ p.story,
 }
 
 .mg-menu > p,
-.mg-screen p {
+.mg-screen p,
+.mg-screen li,
+.d2-screen p,
+.d2-screen li {
   color: #f4f1e4;
-  line-height: 1.45;
+  font-size: var(--mg-text);
+  line-height: var(--mg-text-tight);
 }
 
 .mg-progress {
@@ -967,13 +988,13 @@ p.story,
 
 .mg-progress-label {
   color: #ffe000;
-  font-size: 14px;
+  font-size: var(--mg-label-size);
 }
 
 .mg-dossiers {
   display: grid;
-  gap: 10px;
-  margin: 16px 0;
+  gap: 12px;
+  margin: 8px 0;
 }
 
 .mg-dossiers button,
@@ -983,29 +1004,31 @@ p.story,
   background: #003b1f;
   border: 1px solid rgba(255, 224, 0, 0.35);
   border-radius: 14px;
-  padding: 12px 14px;
+  padding: 16px 16px;
   display: grid;
-  gap: 2px;
+  gap: 4px;
 }
 
 .mg-dossiers button span,
 .mg-ending > button span,
 .mg-kicker {
   color: #ffe000;
-  font-size: 13px;
+  font-size: var(--mg-kicker-size);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .mg-dossiers strong,
 .mg-ending > button strong {
-  font-size: 20px;
+  font-size: 22px;
+  line-height: 1.15;
   text-transform: uppercase;
 }
 
 .mg-dossiers em,
 .mg-ending > button em {
   font-style: normal;
-  font-size: 13px;
+  font-size: var(--mg-label-size);
 }
 
 .mg-dossiers .is-open {
@@ -1049,10 +1072,11 @@ p.story,
 
 .mg-yellow,
 .mg-ghost {
-  min-height: 52px;
-  border-radius: 10px;
-  padding: 0 16px;
+  min-height: var(--mg-control);
+  border-radius: 12px;
+  padding: 0 18px;
   border: 0;
+  font-size: var(--mg-label-size);
 }
 
 .mg-yellow {
@@ -1291,13 +1315,13 @@ p.story,
 .mg-actions,
 .mg-success {
   display: grid;
-  gap: 10px;
-  margin-top: 12px;
+  gap: 14px;
+  margin-top: 4px;
 }
 
 .mg-answer,
 .mg-success {
-  padding: 16px;
+  padding: 18px;
   border-radius: 16px;
   background: #0c1f16;
 }
@@ -1311,13 +1335,13 @@ p.story,
 .mg-answer textarea,
 .mg-code input {
   width: 100%;
-  min-height: 48px;
-  border-radius: 10px;
+  min-height: var(--mg-control);
+  border-radius: 12px;
   border: 1px solid rgba(255, 224, 0, 0.5);
   background: #07140e;
   color: #fff;
-  padding: 10px 12px;
-  font-size: 16px;
+  padding: 14px 16px;
+  font-size: var(--mg-text);
 }
 
 .mg-success img {
@@ -1342,23 +1366,27 @@ p.story,
 .mg-document {
   background: #f3edd8;
   color: #1a2418;
-  padding: 14px;
-  border-radius: 8px;
+  padding: 18px;
+  border-radius: 12px;
   animation: mg-slide 0.6s ease;
+  font-size: var(--mg-text);
 }
 
 .mg-document header {
   font-family: var(--font-label), sans-serif;
+  font-size: var(--mg-kicker-size);
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  margin-bottom: 8px;
 }
 
 .mg-gap,
 .mg-fragment {
-  min-height: 46px;
-  margin-top: 8px;
-  border-radius: 8px;
+  min-height: var(--mg-control);
+  margin-top: 10px;
+  border-radius: 10px;
   touch-action: none;
+  font-size: var(--mg-text);
 }
 
 .mg-gap {
@@ -1367,12 +1395,13 @@ p.story,
   background: rgba(0, 59, 31, 0.08);
   border: 1px dashed #003b1f;
   color: #003b1f;
+  padding: 12px 14px;
 }
 
 .mg-fragments {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
   margin-top: 12px;
 }
 
@@ -1380,7 +1409,7 @@ p.story,
   background: #ffe000;
   color: #080808;
   border: 0;
-  padding: 0 12px;
+  padding: 0 16px;
 }
 
 .mg-fragment.is-selected {
@@ -1389,42 +1418,43 @@ p.story,
 
 .mg-minutes .mg-brief {
   display: grid;
-  grid-template-columns: 22px 1fr;
-  gap: 10px;
+  grid-template-columns: 28px 1fr;
+  gap: 12px;
   align-items: start;
-  margin: 4px 0 12px;
-  padding: 12px 14px;
+  margin: 0;
+  padding: 16px 16px 18px;
   border-radius: 14px;
   background: #10281c;
 }
 
 .mg-minutes .mg-brief i {
-  width: 22px;
-  height: 22px;
+  width: 28px;
+  height: 28px;
   border-radius: 99px;
   background: #ffe000;
   color: #080808;
   font-family: var(--font-label), Impact, sans-serif;
   font-style: normal;
+  font-size: 16px;
   text-align: center;
-  line-height: 22px;
+  line-height: 28px;
 }
 
 .mg-minutes .mg-brief strong,
 .mg-minutes .mg-answer h2,
 .mg-minutes .mg-confirm h2 {
   color: #ffe000;
-  font-size: 18px;
-  line-height: 1.15;
+  font-size: 20px;
+  line-height: 1.2;
   margin: 0;
   text-transform: uppercase;
 }
 
 .mg-minutes .mg-brief p,
 .mg-minutes .mg-confirm p {
-  margin: 4px 0 0;
-  font-size: 17px;
-  line-height: 1.55;
+  margin: 6px 0 0;
+  font-size: var(--mg-text);
+  line-height: var(--mg-text-tight);
 }
 
 .mg-minutes .mg-document {
@@ -1434,8 +1464,8 @@ p.story,
 .mg-minutes .mg-gap,
 .mg-minutes .mg-fragment,
 .mg-minutes .mg-yellow {
-  min-height: 52px;
-  font-size: 16px;
+  min-height: var(--mg-control);
+  font-size: var(--mg-text);
 }
 
 .mg-minutes .mg-fragment {
@@ -1519,11 +1549,13 @@ p.story,
 
 .mg-timeline button {
   flex: 0 0 auto;
-  min-height: 42px;
+  min-height: 48px;
+  padding: 10px 14px;
   border-radius: 999px;
   border: 1px solid rgba(255, 224, 0, 0.4);
   background: transparent;
   color: #fff;
+  font-size: var(--mg-label-size);
 }
 
 .mg-timeline .is-on {
@@ -1539,35 +1571,40 @@ p.story,
 
 .mg-code input {
   text-align: center;
-  font-size: 28px;
+  font-size: 32px;
 }
 
 .mg-ending ul {
   list-style: none;
   padding: 0;
   display: grid;
-  gap: 8px;
+  gap: 12px;
 }
 
 .mg-ending li {
   background: #003b1f;
-  padding: 10px 12px;
+  padding: 14px 16px;
   border-left: 4px solid #ffe000;
   animation: mg-slide 0.5s ease both;
+  font-size: var(--mg-text);
+  line-height: var(--mg-text-tight);
 }
 
 .mg-props {
   list-style: none;
-  margin: 10px 0 0;
+  margin: 12px 0 0;
   padding: 0;
   display: grid;
-  gap: 10px;
+  gap: 12px;
+  font-size: var(--mg-text);
 }
 
 .mg-props li {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  font-size: var(--mg-text);
+  line-height: 1.4;
 }
 
 .mg-props li::before {
@@ -1672,7 +1709,7 @@ p.story,
 }
 
 .d2-screen .mg-bar h1 {
-  font-size: 16px;
+  font-size: var(--mg-title-size);
   line-height: 1.1;
   margin: 0;
 }
@@ -1682,8 +1719,8 @@ p.story,
 .d2-paper h2,
 .d2-paper h3 {
   margin: 4px 0 10px;
-  font-size: clamp(26px, 7vw, 34px);
-  line-height: 0.95;
+  font-size: clamp(28px, 6vw, 38px);
+  line-height: 1.05;
   text-transform: uppercase;
 }
 
@@ -2567,58 +2604,75 @@ p.story,
   font-size: 12px;
 }
 
+.mg-alert,
+.mg-banner,
+.mg-bad {
+  font-size: var(--mg-text) !important;
+  line-height: var(--mg-text-tight);
+}
+
+.mg-sheet h2,
+.mg-sheet h3 {
+  font-size: clamp(22px, 4vw, 28px);
+}
+
+.mg-sheet p,
+.mg-sheet li {
+  font-size: var(--mg-text);
+  line-height: var(--mg-text-tight);
+}
+
+.d2-people button,
+.d2-zones button,
+.d2-strips button {
+  min-height: var(--mg-control);
+  font-size: var(--mg-text) !important;
+  padding: 14px !important;
+}
+
+.d2-people small {
+  font-size: var(--mg-label-size) !important;
+  margin-top: 4px;
+}
+
 /* iPad / tablet: bredere frame, grotere tekst */
 @media (min-width: 768px) {
   .mg-phone {
-    --mg-frame: 860px;
-    --mg-nav-h: 68px;
+    --mg-frame: 900px;
+    --mg-nav-h: 72px;
+    --mg-text: 22px;
+    --mg-text-tight: 1.58;
+    --mg-kicker-size: 17px;
+    --mg-title-size: clamp(32px, 3.8vw, 42px);
+    --mg-label-size: 18px;
+    --mg-control: 62px;
   }
 
   .mg-menu,
   .mg-screen,
   .mg-splash {
-    padding: 24px 28px 36px;
+    padding: 28px 32px 40px;
+    gap: 18px;
   }
 
-  .mg-bar h1,
-  .d2-screen h1,
-  .d2-screen h2 {
-    font-size: clamp(28px, 3.4vw, 40px);
+  .mg-tag {
+    font-size: 17px;
+    padding: 8px 12px;
   }
 
-  .mg-block p,
-  .mg-note,
-  .mg-answer p,
-  .mg-success p,
-  .mg-brief p,
-  .d2-screen > p,
-  .mg-minutes .mg-brief p,
-  .mg-minutes .mg-confirm p {
-    font-size: 19px;
-    line-height: 1.6;
+  .mg-dossiers strong,
+  .mg-ending > button strong {
+    font-size: 26px;
   }
 
   .mg-minutes .mg-brief strong,
   .mg-minutes .mg-answer h2,
-  .mg-minutes .mg-confirm h2,
-  .mg-answer .mg-kicker,
-  .mg-kicker {
-    font-size: 18px;
-  }
-
-  .mg-minutes .mg-gap,
-  .mg-minutes .mg-fragment,
-  .mg-minutes .mg-yellow,
-  .mg-answer input,
-  .mg-answer textarea,
-  .d2-strips button,
-  .d2-people button {
-    min-height: 56px;
-    font-size: 18px;
+  .mg-minutes .mg-confirm h2 {
+    font-size: 22px;
   }
 
   .mg-nav button {
-    font-size: 16px;
+    font-size: 17px;
   }
 
   .mg-screen > .mg-cta,
@@ -2628,34 +2682,50 @@ p.story,
   .mg-success > .mg-cta,
   .mg-confirm > .mg-cta,
   .d2-screen > .mg-cta {
-    min-height: 64px;
-    font-size: 20px;
+    min-height: 68px;
+    font-size: 22px;
   }
 
   .d2-compare article {
-    min-height: 180px;
-    padding: 20px 18px;
+    min-height: 200px;
+    padding: 22px 20px;
   }
 
   .d2-compare article span {
-    font-size: 17px;
+    font-size: 18px;
   }
 
   .d2-compare article em {
-    font-size: 16px;
+    font-size: 17px;
   }
 
   .d2-strips {
     grid-template-columns: 1fr 1fr;
   }
+
+  .d2-ink b {
+    font-size: 16px;
+  }
+
+  .d2-ink strong {
+    font-size: 11px;
+  }
+
+  .d2-plate b {
+    font-size: 17px;
+  }
+
+  .d2-plate strong {
+    font-size: 13px;
+  }
 }
 
 @media (min-width: 768px) and (orientation: landscape) {
   .mg-phone {
-    --mg-frame: 980px;
+    --mg-frame: 1040px;
   }
 
   .d2-compare {
-    gap: 16px;
+    gap: 18px;
   }
 }
