@@ -931,14 +931,22 @@ p.story,
   font-size: 40px;
 }
 
+/* Lege stoel links (tussen Erik en Karin) */
 .mg-qmark.is-empty-a {
-  left: 28%;
-  bottom: 10%;
+  top: 26%;
+  left: 14%;
+  width: 64px;
+  height: 64px;
+  font-size: 34px;
 }
 
+/* Lege stoel rechts (tussen Erik en Tom) */
 .mg-qmark.is-empty-b {
-  right: 28%;
-  bottom: 10%;
+  top: 26%;
+  right: 14%;
+  width: 64px;
+  height: 64px;
+  font-size: 34px;
 }
 
 .mg-logo,
