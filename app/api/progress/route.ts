@@ -1,10 +1,10 @@
-import { flowResponse, json, readCookie, TEAM_COOKIE } from "@/lib/events/http";
+import { flowResponse, json, readTeamToken } from "@/lib/events/http";
 import { getService } from "@/lib/events/runtime";
 import type { Phase } from "@/lib/events/types";
 
 export async function POST(request: Request) {
   try {
-    const token = await readCookie(TEAM_COOKIE);
+    const token = await readTeamToken(request);
     if (!token) return json({ error: "Dit team is niet aangemeld.", code: "unauthorized" }, 401);
     const body = (await request.json()) as { stepIndex?: unknown; phase?: unknown };
     const phase = body.phase;

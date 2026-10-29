@@ -39,12 +39,12 @@ function EventApp() {
       if (!next.team) {
         const resume = readTeamResume();
         if (resume) {
-          const rejoined = await postJson<{ row: TeamRow }>("/api/join", {
+          const rejoined = await postJson<{ row: TeamRow; token?: string }>("/api/join", {
             code: resume.code,
             clientId: resume.clientId,
           });
           if (!ignore && rejoined.ok) {
-            saveTeamResume(resume.code, resume.clientId);
+            saveTeamResume(resume.code, resume.clientId, rejoined.data.token);
             next = { ...next, team: { row: rejoined.data.row } };
           } else if (!ignore && !rejoined.ok) {
             clearTeamResume();

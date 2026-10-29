@@ -1,22 +1,33 @@
-import { flowResponse, HOST_COOKIE, json, jsonClearCookie, readCookie, TEAM_COOKIE } from "@/lib/events/http";
+import { flowResponse, HOST_COOKIE, json, jsonClearCookie, jsonWithCookie, readCookie, readTeamToken, TEAM_COOKIE } from "@/lib/events/http";
 import { getService } from "@/lib/events/runtime";
 import { FlowError } from "@/lib/events/types";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const service = getService();
     const hostToken = await readCookie(HOST_COOKIE);
-    const teamToken = await readCookie(TEAM_COOKIE);
+    const teamToken = await readTeamToken(request);
     const host = hostToken ? await readHost(service, hostToken) : null;
     const team = teamToken ? await readTeam(service, teamToken) : null;
 
     if (hostToken && !host && teamToken && !team) {
       const cleared = jsonClearCookie({ host: null, team: null }, HOST_COOKIE);
-      cleared.cookies.set(TEAM_COOKIE, "", { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: 0 });
+      cleared.cookies.set(TEAM_COOKIE, "", {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: 0,
+      });
       return cleared;
     }
     if (hostToken && !host) return jsonClearCookie({ host: null, team }, HOST_COOKIE);
     if (teamToken && !team) return jsonClearCookie({ host, team: null }, TEAM_COOKIE);
+
+    // Herstel httpOnly cookie als de client alleen via localStorage-token binnenkomt.
+    if (team && teamToken && !(await readCookie(TEAM_COOKIE))) {
+      return jsonWithCookie({ host, team }, TEAM_COOKIE, teamToken);
+    }
 
     return json({ host, team });
   } catch (error) {

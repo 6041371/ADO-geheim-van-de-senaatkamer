@@ -22,13 +22,13 @@ export function JoinRoom({ onHome, onJoined }: { onHome: () => void; onJoined: (
     setError(null);
     const clientId = browserClientId();
     const normalized = code.trim().toUpperCase();
-    const result = await postJson<LivePayload>("/api/join", { code: normalized, clientId });
+    const result = await postJson<LivePayload & { token?: string }>("/api/join", { code: normalized, clientId });
     setPending(false);
     if (!result.ok) {
       setError(result.data.error ?? "Deze code werkt niet.");
       return;
     }
-    saveTeamResume(normalized, clientId);
+    saveTeamResume(normalized, clientId, result.data.token);
     onJoined();
   }
 

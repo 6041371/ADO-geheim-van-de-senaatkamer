@@ -1,21 +1,30 @@
+import { readTeamToken } from "./resume";
+
 export type ApiFailure = { error?: string; code?: string; missing?: string[] };
+
+function withAuth(headers?: HeadersInit): HeadersInit {
+  const next = new Headers(headers);
+  const token = readTeamToken();
+  if (token) next.set("x-ado-team", token);
+  return next;
+}
 
 export async function postJson<T>(url: string, body?: unknown): Promise<{ ok: true; data: T } | { ok: false; data: ApiFailure }> {
   const response = await fetch(url, {
     method: "POST",
     credentials: "same-origin",
-    headers: body === undefined ? undefined : { "Content-Type": "application/json" },
+    headers: withAuth(body === undefined ? undefined : { "Content-Type": "application/json" }),
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   return read<T>(response);
 }
 
 export async function getJson<T>(url: string) {
-  return read<T>(await fetch(url, { credentials: "same-origin" }));
+  return read<T>(await fetch(url, { credentials: "same-origin", headers: withAuth() }));
 }
 
 export async function deleteJson<T>(url: string) {
-  return read<T>(await fetch(url, { method: "DELETE", credentials: "same-origin" }));
+  return read<T>(await fetch(url, { method: "DELETE", credentials: "same-origin", headers: withAuth() }));
 }
 
 async function read<T>(response: Response): Promise<{ ok: true; data: T } | { ok: false; data: ApiFailure }> {

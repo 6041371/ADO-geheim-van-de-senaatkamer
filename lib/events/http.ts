@@ -4,6 +4,7 @@ import { FlowError } from "./types";
 
 export const HOST_COOKIE = "ado_host";
 export const TEAM_COOKIE = "ado_team";
+export const TEAM_HEADER = "x-ado-team";
 
 export function cookieOptions(maxAge: number) {
   return {
@@ -44,6 +45,13 @@ export function flowResponse(error: unknown) {
 
 export async function readCookie(name: string) {
   return (await cookies()).get(name)?.value ?? null;
+}
+
+export async function readTeamToken(request?: Request) {
+  const fromCookie = await readCookie(TEAM_COOKIE);
+  if (fromCookie) return fromCookie;
+  const fromHeader = request?.headers.get(TEAM_HEADER)?.trim();
+  return fromHeader || null;
 }
 
 /** @deprecated Prefer jsonWithCookie on the response in route handlers. */

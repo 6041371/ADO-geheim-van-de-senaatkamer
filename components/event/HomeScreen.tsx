@@ -30,13 +30,13 @@ export function HomeScreen({
     setError(null);
     const clientId = browserClientId();
     const normalized = code.trim().toUpperCase();
-    const result = await postJson("/api/join", { code: normalized, clientId });
+    const result = await postJson<{ token?: string }>("/api/join", { code: normalized, clientId });
     if (!result.ok) {
       setError(result.data.error ?? "Deze code klopt niet.");
       setBusy(false);
       return;
     }
-    saveTeamResume(normalized, clientId);
+    saveTeamResume(normalized, clientId, result.data.token);
     onJoined(normalized);
   }
 
