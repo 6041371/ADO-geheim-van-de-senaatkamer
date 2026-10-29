@@ -913,6 +913,7 @@ p.story,
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35);
 }
 
+.mg-tag.is-erik { top: 11%; left: 50%; transform: translateX(-50%); }
 .mg-tag.is-karin { top: 42%; left: 8%; }
 .mg-tag.is-tom { top: 40%; right: 7%; }
 
@@ -930,16 +931,14 @@ p.story,
   font-size: 40px;
 }
 
-.mg-qmark.is-head {
-  top: 10%;
-  left: 50%;
-  transform: translateX(-50%);
+.mg-qmark.is-empty-a {
+  left: 28%;
+  bottom: 10%;
 }
 
-.mg-qmark.is-foot {
-  left: 50%;
-  bottom: 11%;
-  transform: translateX(-50%);
+.mg-qmark.is-empty-b {
+  right: 28%;
+  bottom: 10%;
 }
 
 .mg-logo,

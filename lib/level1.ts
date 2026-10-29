@@ -23,8 +23,8 @@ export type HintSet = {
 export const HINTS: Record<"attendance" | "minutes" | "time", HintSet> = {
   attendance: {
     props: "Pak de aanwezigheidslijst en de naamkaartjes van de bestuursleden.",
-    hint1: "Vergelijk de naamkaartjes op de tafel met de namen op de aanwezigheidslijst. Karin Bos en Tom Albers zitten er wel.",
-    hint2: "Er ontbreken twee bestuursleden. Erik Meijer stond wel genoteerd, maar hoorde niet bij de lege stoelen van het bestuur.",
+    hint1: "Vergelijk de naamkaartjes op de tafel met de namen op de aanwezigheidslijst. Erik Meijer, Karin Bos en Tom Albers zitten er wel.",
+    hint2: "Er ontbreken twee personen. Vijf namen horen bij die avond; drie stoelen zijn bezet.",
     hint3: "De twee ontbrekende namen zijn Marcel de Vries en Sophie van Rijn.",
   },
   minutes: {

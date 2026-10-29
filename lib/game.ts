@@ -87,8 +87,8 @@ export const STEPS: Step[] = [
     kicker: "Opdracht 1 · Wie was aanwezig?",
     story: [
       "Jullie zitten in de Senaatskamer. Jaren geleden, toen hier nog sigaren werden gerookt, vond een vertrouwelijke bestuursvergadering plaats over de toekomst van het stadion.",
-      "Vier bestuursleden hoorden bij die avond: Marcel de Vries, Karin Bos, Tom Albers en Sophie van Rijn. Erik Meijer stond ook op de aanwezigheidslijst, maar zat niet bij het bestuur aan tafel.",
-      "Toen de vergadering begon, vielen twee lege stoelen op. Alleen Karin Bos en Tom Albers zaten er al.",
+      "Vijf mensen hoorden bij die avond: Marcel de Vries, Karin Bos, Tom Albers, Sophie van Rijn en Erik Meijer.",
+      "Toen de vergadering begon, zaten Erik Meijer, Karin Bos en Tom Albers al aan tafel. Twee stoelen waren nog leeg.",
     ],
     prompt: "Wie waren bij aanvang van de vergadering nog niet aanwezig?",
     choices: [
@@ -98,7 +98,7 @@ export const STEPS: Step[] = [
       { id: "karin-tom", label: "Karin Bos en Tom Albers" },
     ],
     correctId: "marcel-sophie",
-    wrong: "Kijk wie er bij de start ontbrak. Karin en Tom zaten er wel; Erik Meijer hoorde niet bij de lege bestuursstoelen.",
+    wrong: "Kijk wie er bij de start ontbrak. Erik, Karin en Tom zaten er wel.",
     reveal: "Marcel de Vries en Sophie van Rijn waren nog niet aanwezig toen de vergadering begon.",
     hint: "Pak de notulen.",
   },
