@@ -2744,61 +2744,89 @@ p.story,
   }
 }
 
-/* Large phones / small tablets */
-@media (min-width: 480px) {
+/* Large phones */
+@media (min-width: 480px) and (max-width: 767px) {
   .mg-phone {
-    width: min(100%, 520px);
-    --mg-scene: min(100%, 460px);
+    width: min(100%, 560px);
+    --mg-scene: min(100%, 480px);
   }
 
-  .mg-nav {
-    width: min(100%, 520px);
+  .mg-nav,
+  .mg-sheet,
+  .d3-zoom-card {
+    width: min(100%, 560px);
   }
 }
 
-/* iPad portrait & tablets: leesbaarder, geen desktop-stretch */
+/* iPad / tablets: bijna volle breedte, grote tekst */
 @media (min-width: 768px) {
   .app {
-    width: min(760px, calc(100% - 40px));
-    padding: 28px 0 64px;
+    width: min(920px, calc(100% - 40px));
+    padding: 32px 0 72px;
   }
 
   .hero {
-    width: min(560px, calc(100% - 36px));
+    width: min(720px, calc(100% - 40px));
   }
 
   .mg-phone {
-    width: min(100%, 640px);
-    --mg-scene: min(100%, 520px);
-    --mg-nav-h: 72px;
-    --mg-text: 21px;
+    width: min(calc(100% - 32px), 980px);
+    --mg-scene: min(100%, 640px);
+    --mg-nav-h: 78px;
+    --mg-text: 23px;
     --mg-text-tight: 1.55;
-    --mg-kicker-size: 16px;
-    --mg-title-size: clamp(30px, 3.5vw, 38px);
-    --mg-label-size: 17px;
-    --mg-control: 62px;
-    --mg-tag-size: 15px;
-    --mg-qmark-size: 64px;
+    --mg-kicker-size: 17px;
+    --mg-title-size: clamp(36px, 4.5vw, 48px);
+    --mg-label-size: 19px;
+    --mg-control: 68px;
+    --mg-tag-size: 17px;
+    --mg-qmark-size: 72px;
   }
 
-  .mg-nav {
-    width: min(100%, 640px);
+  .mg-nav,
+  .mg-sheet,
+  .d3-zoom-card {
+    width: min(calc(100% - 32px), 980px);
   }
 
   .mg-menu,
   .mg-screen,
   .mg-splash {
-    padding: 26px 28px 36px;
-    gap: 16px;
+    padding: 32px 36px 44px;
+    gap: 20px;
+  }
+
+  .mg-splash h1 {
+    font-size: clamp(48px, 8vw, 64px);
+  }
+
+  .mg-polaroid {
+    width: min(100%, 420px);
+  }
+
+  .mg-polaroid img {
+    height: 240px;
   }
 
   .mg-dossiers strong,
   .mg-ending > button strong {
-    font-size: 24px;
+    font-size: 28px;
+  }
+
+  .mg-dossiers button,
+  .mg-ending > button {
+    padding: 18px 20px;
+    min-height: 88px;
   }
 
   .mg-nav button {
-    font-size: 16px;
+    font-size: 18px;
+  }
+
+  .mg-yellow,
+  .mg-ghost {
+    min-height: var(--mg-control);
+    font-size: 20px;
   }
 
   .mg-screen > .mg-cta,
@@ -2810,8 +2838,8 @@ p.story,
   .d2-screen > .mg-cta,
   .d3-screen > .mg-cta,
   .d3-ask > .mg-cta {
-    min-height: 64px;
-    font-size: 20px;
+    min-height: 72px;
+    font-size: 22px;
   }
 
   .d2-compare {
@@ -2819,8 +2847,8 @@ p.story,
   }
 
   .d2-compare article {
-    min-height: 180px;
-    padding: 20px 18px;
+    min-height: 200px;
+    padding: 22px 20px;
   }
 
   .d2-strips {
@@ -2832,68 +2860,63 @@ p.story,
   }
 
   .mg-dev-grid {
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
   }
 
-  .mg-sheet,
-  .d3-zoom-card {
-    width: min(100%, 640px);
+  .mg-dev-grid button {
+    min-height: 64px;
+    padding: 14px 16px;
+    font-size: 16px;
+  }
+
+  .mg-dev-grid button strong {
+    font-size: 15px;
+    margin-bottom: 4px;
   }
 }
 
-/* Desktop / large screens: vaste speelkolom, gecentreerd */
+/* iPad landscape / grote tablets */
 @media (min-width: 1024px) {
-  .mg {
-    display: grid;
-    place-items: start center;
-    background:
-      radial-gradient(circle at 50% 0%, rgba(0, 130, 55, 0.22), transparent 50%),
-      #071d15;
-  }
-
   .mg-phone {
-    width: 560px;
-    --mg-scene: 480px;
-    --mg-text: 19px;
-    --mg-title-size: 32px;
-    --mg-label-size: 16px;
-    --mg-kicker-size: 15px;
-    --mg-control: 58px;
-    --mg-tag-size: 14px;
-    --mg-qmark-size: 60px;
-    min-height: 100dvh;
-    box-shadow: 0 0 0 1px rgba(255, 224, 0, 0.12), 0 24px 80px rgba(0, 0, 0, 0.45);
-  }
-
-  .mg-nav {
-    width: 560px;
-  }
-
-  .mg-sheet,
-  .d3-zoom-card {
-    width: min(100%, 560px);
-  }
-
-  .app {
-    width: min(640px, calc(100% - 48px));
-  }
-
-  .hero {
-    width: min(520px, calc(100% - 48px));
-  }
-}
-
-/* Wide desktop */
-@media (min-width: 1280px) {
-  .mg-phone {
-    width: 600px;
-    --mg-scene: 500px;
+    width: min(calc(100% - 48px), 1080px);
+    --mg-scene: min(100%, 680px);
+    --mg-text: 24px;
+    --mg-title-size: clamp(40px, 4vw, 52px);
+    --mg-label-size: 20px;
+    --mg-control: 70px;
   }
 
   .mg-nav,
   .mg-sheet,
   .d3-zoom-card {
-    width: 600px;
+    width: min(calc(100% - 48px), 1080px);
+  }
+
+  .mg-dev-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .app {
+    width: min(980px, calc(100% - 48px));
+  }
+
+  .hero {
+    width: min(780px, calc(100% - 48px));
+  }
+}
+
+/* Alleen echte brede desktops: kolom iets begrenzen */
+@media (min-width: 1400px) {
+  .mg-phone {
+    width: min(100%, 1100px);
+    --mg-scene: 720px;
+  }
+
+  .mg-nav,
+  .mg-sheet,
+  .d3-zoom-card {
+    width: min(100%, 1100px);
   }
 }
 
