@@ -504,14 +504,34 @@ function CompareTask({
       <Bar kicker="Dossier 02" title="Opdracht 6" step={2} onBack={onBack} />
       <h2>Het ontbrekende document</h2>
       <div className="d2-compare" aria-label="Vergelijk interne versie met persversie">
-        <article>
-          <span>Interne versie</span>
-          <em>Volledig stadiondossier · SD-2023-10 · alleen voor bestuur</em>
+        <article className="d2-doc-card is-internal">
+          <header>
+            <span>Interne versie</span>
+            <b className="d2-stamp">Vertrouwelijk</b>
+          </header>
+          <strong>Stadiondossier SD-2023-10</strong>
+          <em>Volledig · alleen voor bestuur</em>
+          <ul>
+            <li>Locatieopties</li>
+            <li>Financiële onderbouwing</li>
+            <li>Risicoanalyse</li>
+            <li>Technische specificaties</li>
+          </ul>
         </article>
         <i className="d2-glass" aria-hidden="true" />
-        <article>
-          <span>Persversie</span>
-          <em>Goedgekeurde conceptpersverklaring · beperkte openbare inhoud</em>
+        <article className="d2-doc-card is-press">
+          <header>
+            <span>Persversie</span>
+            <b className="d2-badge">Goedgekeurd</b>
+          </header>
+          <strong>Conceptpersverklaring</strong>
+          <em>Beperkte openbare inhoud</em>
+          <ul>
+            <li>Algemene toekomstplannen</li>
+            <li className="is-redacted">████████████</li>
+            <li className="is-redacted">████████████</li>
+            <li className="is-redacted">████████████</li>
+          </ul>
         </article>
       </div>
       <p className="mg-note">De interne stadionplannen bevatten meer informatie dan de documenten die voor de pers bedoeld waren. Vergelijk de fysieke documenten en ontdek welke gegevens bewust niet openbaar mochten worden gemaakt.</p>

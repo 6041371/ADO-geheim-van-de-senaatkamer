@@ -453,7 +453,7 @@ function AnswerBar({
       <div className="actions">
         {revealed ? (
           <button className="primary" type="button" onClick={onNext}>
-            Volgende
+            Volgende opdracht
           </button>
         ) : (
           <button className="primary" type="button" onClick={onCheck} disabled={!canCheck}>
