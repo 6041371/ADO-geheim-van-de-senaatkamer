@@ -72,7 +72,7 @@ function PressTask({ onBack, onNext }: { onBack: () => void; onNext: () => void 
     <section className="mg-screen d3-screen">
       <Bar kicker="Dossier 03 · Opdracht 7" title="Persconferentie" step={0} onBack={onBack} />
       <p className="mg-note">
-        Het bestuur had een communicatiestrategie. Bekijk de conceptpersverklaring en de sleutelwoorden die tijdens de persconferentie zijn vastgelegd.
+        Dit is een conceptpersverklaring: wat ADO Den Haag officieel mocht zeggen. De zwarte stukken zijn bewust weggelaten — die bleven intern. Bekijk daarna de sleutelwoorden van de persconferentie en beantwoord de publicatiecheck.
       </p>
 
       <article className="d3-press-doc">
@@ -88,16 +88,20 @@ function PressTask({ onBack, onNext }: { onBack: () => void; onNext: () => void 
         <p>
           In deze fase worden alleen algemene toekomstplannen gedeeld. Financiële ramingen en technische details van het stadiondossier blijven intern totdat een definitief besluit is genomen.
         </p>
-        <p className="d3-redacted" aria-label="Zwartgemaakte passages">
-          ████████ · ██████████ · █████████
-        </p>
+        <div className="d3-redacted" aria-label="Zwartgelakte interne passages">
+          <span className="d3-redacted-label">Zwartgelakt · intern</span>
+          <i />
+          <i />
+          <i />
+        </div>
         <button className="mg-ghost" type="button" onClick={() => setOpened((value) => !value)}>
-          {opened ? "Verberg sleutelwoorden" : "Toon sleutelwoorden"}
+          {opened ? "Verberg sleutelwoorden" : "Toon sleutelwoorden van de persconferentie"}
         </button>
       </article>
 
       {opened ? (
         <div className="d3-keys" role="list">
+          <p className="mg-kicker">Vastgelegd tijdens de persconferentie</p>
           {PRESS_KEYWORDS.map((item) => (
             <span key={item.id} role="listitem">
               {item.label}

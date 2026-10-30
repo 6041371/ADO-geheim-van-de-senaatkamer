@@ -3166,13 +3166,54 @@ p.story,
 
 .d3-redacted,
 .d3-blackout {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0;
+  padding: 12px;
+  background: #141414;
+  border: 1px dashed rgba(255, 255, 255, 0.28);
+  border-radius: 8px;
+}
+
+.d3-redacted-label {
+  font-family: var(--font-label), Impact, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ffe000;
+}
+
+.d3-redacted i {
   display: block;
-  margin: 10px 0;
-  padding: 8px 10px;
-  background: #111;
-  color: #111;
-  letter-spacing: 0.12em;
-  border-radius: 4px;
+  height: 14px;
+  border-radius: 2px;
+  background: #000;
+}
+
+.d3-redacted i:nth-child(2) {
+  width: 72%;
+}
+
+.d3-redacted i:nth-child(3) {
+  width: 88%;
+}
+
+.d3-redacted i:nth-child(4) {
+  width: 64%;
+}
+
+.d3-keys .mg-kicker {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.d3-press-doc .mg-ghost {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 4px;
+  border: 1px solid rgba(16, 32, 22, 0.35);
+  color: #102016;
+  background: rgba(255, 255, 255, 0.45);
 }
 
 .d3-keys {
