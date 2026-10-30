@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
+  FINDINGS,
   GAME_MINUTES,
   LEVELS,
   PEOPLE,
@@ -26,7 +27,6 @@ export function Walkthrough({
   const [overtime, setOvertime] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [order, setOrder] = useState<string[]>([]);
-  const [answer, setAnswer] = useState("");
   const [wrong, setWrong] = useState<string | null>(null);
   const [revealed, setRevealed] = useState(false);
   const step = STEPS[Math.min(stepIndex, STEPS.length - 1)];
@@ -34,7 +34,6 @@ export function Walkthrough({
   useEffect(() => {
     setSelected(null);
     setOrder([]);
-    setAnswer("");
     setWrong(null);
     setRevealed(false);
   }, [stepIndex]);
@@ -127,18 +126,19 @@ export function Walkthrough({
         <SheetCard onConfirm={goNext} />
       ) : step.kind === "dader" ? (
         <DaderCard
-          answer={answer}
+          selected={selected}
           wrong={wrong}
-          onChange={(value) => {
-            setAnswer(value);
+          onSelect={(name) => {
+            setSelected(name);
             setWrong(null);
           }}
           onCheck={() => {
-            if (isDader(answer)) {
+            if (!selected) return;
+            if (isDader(selected)) {
               setWrong(null);
               goNext();
             } else {
-              setWrong("Die naam sluit het dossier niet. Kijk terug naar het werkstation.");
+              setWrong("Die aanklacht houdt geen stand. Kijk terug naar het werkstation en de digitale sporen.");
             }
           }}
         />
@@ -184,9 +184,10 @@ export function Briefing({
         In zestig minuten reconstrueren jullie wat er gelekt is en wie dat deed. Het verhaal staat in deze
         app. De bewijsstukken blijven op tafel.
       </p>
-      <div className="people">
+      <div className="people people-passes">
         {PEOPLE.map((person) => (
           <div key={person.name}>
+            <img src={person.pass} alt={`Toegangspas ${person.name}`} />
             <strong>{person.name}</strong>
             <span>{person.role}</span>
           </div>
@@ -311,22 +312,37 @@ function OrderCard({
 }
 
 function SheetCard({ onConfirm }: { onConfirm: () => void }) {
+  const [checked, setChecked] = useState<Record<number, boolean>>({});
+  const ready = FINDINGS.every((_, index) => checked[index]);
+
   return (
     <article className="paper sheet">
       <p className="kicker">Dossier 5 · De Waarheid</p>
-      <h2>Onderzoeksblad</h2>
-      <p>Pak het eindrapport. Vul het blad op papier in voordat jullie de dader noemen.</p>
-      <ol>
-        <li>Algemene informatie</li>
-        <li>Betrokken personen</li>
-        <li>Bevindingen</li>
-        <li>Analyse</li>
-        <li>Conclusie en aanbevelingen</li>
-      </ol>
-      <p>De naam van de dader komt daarna, in de app.</p>
+      <h2>Eindrapport afronden</h2>
+      <p className="story">
+        Pak het papieren eindrapport. Vink hier af wat jullie op het blad hebben vastgelegd — pas daarna volgt de
+        aanklacht.
+      </p>
+      <ul className="finding-list">
+        {FINDINGS.map((finding, index) => (
+          <li key={finding}>
+            <label>
+              <input
+                type="checkbox"
+                checked={Boolean(checked[index])}
+                onChange={(event) =>
+                  setChecked((current) => ({ ...current, [index]: event.target.checked }))
+                }
+              />
+              <span>{finding}</span>
+            </label>
+          </li>
+        ))}
+      </ul>
+      <p className="meta">Alle vijf de bevindingen moeten kloppen voordat jullie iemand aanklagen.</p>
       <div className="actions">
-        <button className="primary" type="button" onClick={onConfirm}>
-          Het blad is ingevuld
+        <button className="primary" type="button" onClick={onConfirm} disabled={!ready}>
+          Rapport compleet — naar aanklacht
         </button>
       </div>
     </article>
@@ -334,41 +350,44 @@ function SheetCard({ onConfirm }: { onConfirm: () => void }) {
 }
 
 function DaderCard({
-  answer,
+  selected,
   wrong,
-  onChange,
+  onSelect,
   onCheck,
 }: {
-  answer: string;
+  selected: string | null;
   wrong: string | null;
-  onChange: (value: string) => void;
+  onSelect: (name: string) => void;
   onCheck: () => void;
 }) {
   return (
-    <article className="paper">
-      <p className="kicker">Dossier 5 · De laatste vraag</p>
+    <article className="paper dader-card">
+      <p className="kicker">Dossier 5 · Officiële aanklacht</p>
       <h2>Wie lekte de informatie?</h2>
       <p className="story">
-        Het onderzoeksblad ligt ingevuld. Noem de persoon die de vertrouwelijke stadioninformatie naar buiten bracht.
+        Het eindrapport is compleet. Kies de verdachte op basis van de bewijsstukken — niet op gevoel. Daarna sluit
+        jullie de zaak formeel.
       </p>
-      <label className="field">
-        <span className="prompt">Naam van de dader</span>
-        <input
-          value={answer}
-          autoComplete="off"
-          autoCorrect="off"
-          spellCheck={false}
-          placeholder="Typ de volledige naam"
-          onChange={(event) => onChange(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") onCheck();
-          }}
-        />
-      </label>
+      <div className="suspect-grid" role="listbox" aria-label="Verdachten">
+        {PEOPLE.map((person) => (
+          <button
+            key={person.name}
+            type="button"
+            role="option"
+            aria-selected={selected === person.name}
+            className={`suspect${selected === person.name ? " is-on" : ""}`}
+            onClick={() => onSelect(person.name)}
+          >
+            <img src={person.pass} alt="" />
+            <strong>{person.name}</strong>
+            <span>{person.role}</span>
+          </button>
+        ))}
+      </div>
       {wrong ? <p className="feedback">{wrong}</p> : null}
       <div className="actions">
-        <button className="primary" type="button" onClick={onCheck} disabled={answer.trim().length === 0}>
-          Sluit het dossier
+        <button className="primary" type="button" onClick={onCheck} disabled={!selected}>
+          Dien aanklacht in
         </button>
       </div>
     </article>
@@ -376,18 +395,29 @@ function DaderCard({
 }
 
 function Finale() {
+  const guilty = PEOPLE.find((person) => isDader(person.name)) ?? PEOPLE[2];
+
   return (
     <article className="paper finale">
+      <img className="finale-hero" src="/ado/senaatskamer.jpg" alt="De Senaatskamer" />
       <p className="closed">DOSSIER GESLOTEN</p>
+      <p className="stamp gold">Officiële uitslag</p>
+      <div className="finale-verdict">
+        <img src={guilty.pass} alt={`Toegangspas ${guilty.name}`} />
+        <div>
+          <p className="kicker">Verantwoordelijk voor het lek</p>
+          <h2>{guilty.name}</h2>
+          <p>{guilty.role} · toegang tot het vertrouwelijke stadiondossier</p>
+        </div>
+      </div>
       <p>Jarenlang bleef de waarheid verborgen achter de deuren van de Senaatskamer.</p>
       <p>
         Documenten verdwenen, verklaringen spraken elkaar tegen en het vertrouwen binnen de club werd op de proef
         gesteld.
       </p>
-      <p>Maar geen enkel geheim blijft voor altijd verborgen.</p>
       <p>
-        Jullie hebben de gebeurtenissen gereconstrueerd, de aanwijzingen gecombineerd en ontdekt wie verantwoordelijk
-        was voor het lek.
+        Jullie reconstrueerden de vergadering, het embargo, de persconferentie en het lek — en dienden een onderbouwde
+        aanklacht in.
       </p>
       <p>Het Geheim van de Senaatskamer is eindelijk onthuld.</p>
       <p className="stamp">Missie voltooid</p>

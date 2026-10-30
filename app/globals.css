@@ -3783,3 +3783,355 @@ p.story,
   font-weight: 700;
   box-shadow: 0 0 0 2px rgba(255, 224, 0, 0.35);
 }
+
+/* Persconferentie live Q&A */
+.d3-press-hero {
+  margin-bottom: 12px;
+}
+
+.d3-press-live {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #0a1a12;
+  border: 1px solid rgba(255, 224, 0, 0.28);
+  color: #fff;
+  font-family: var(--font-label), Impact, sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.d3-press-live span:last-child {
+  margin-left: auto;
+  color: #ffe000;
+  font-size: 13px;
+}
+
+.d3-live-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #c45b4a;
+  box-shadow: 0 0 0 4px rgba(196, 91, 74, 0.25);
+}
+
+.d3-keyword-track {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.d3-keyword-track span {
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px dashed rgba(255, 224, 0, 0.35);
+  color: rgba(255, 255, 255, 0.45);
+  font-family: var(--font-label), Impact, sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+
+.d3-keyword-track span.is-on {
+  background: #ffe000;
+  color: #080808;
+  border-style: solid;
+  border-color: #ffe000;
+  font-weight: 700;
+}
+
+.d3-press-card,
+.d3-press-done {
+  padding: 18px 16px;
+  border-radius: 16px;
+  background: #10281c;
+  border: 1px solid rgba(255, 224, 0, 0.22);
+  color: #fff;
+}
+
+.d3-press-card h2 {
+  margin: 8px 0 16px;
+  font-size: clamp(22px, 4.5vw, 30px);
+  line-height: 1.15;
+  color: #fff;
+}
+
+.mg-success-inline {
+  margin: 12px 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 224, 0, 0.14);
+  border: 1px solid rgba(255, 224, 0, 0.35);
+  color: #ffe000;
+}
+
+.d3-press-done {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.d3-press-done img {
+  width: 64px;
+  height: auto;
+}
+
+.d3-press-done strong {
+  display: inline-block;
+  padding: 6px 12px;
+  border: 2px solid #c45b4a;
+  color: #c45b4a;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transform: rotate(-3deg);
+}
+
+/* Memory opdracht 9 */
+.d3-timer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #0c1f16;
+  border: 1px solid rgba(255, 224, 0, 0.35);
+  font-family: var(--font-label), Impact, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.d3-timer span {
+  color: #ffe000;
+  font-size: 14px;
+}
+
+.d3-timer strong {
+  font-size: 28px;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.d3-timer.is-low strong {
+  color: #ffe000;
+}
+
+.d3-timer.is-out {
+  border-color: #c45b4a;
+}
+
+.d3-timer.is-out strong {
+  color: #ffd0c8;
+}
+
+.d3-memory {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.d3-mem-card {
+  position: relative;
+  min-height: 92px;
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  perspective: 800px;
+  background: transparent;
+}
+
+.d3-mem-back,
+.d3-mem-front {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 12px;
+  border-radius: 14px;
+  backface-visibility: hidden;
+  transition: transform 0.35s ease;
+  text-align: center;
+  line-height: 1.25;
+}
+
+.d3-mem-back {
+  background: linear-gradient(160deg, #004d28, #003b1f 55%, #071d15);
+  color: #ffe000;
+  font-family: var(--font-label), Impact, sans-serif;
+  letter-spacing: 0.12em;
+  font-size: 18px;
+  border: 1px solid rgba(255, 224, 0, 0.35);
+}
+
+.d3-mem-front {
+  background: #f3e8d0;
+  color: #1a2418;
+  font-size: 15px;
+  font-weight: 700;
+  transform: rotateY(180deg);
+  border: 1px solid rgba(26, 36, 24, 0.18);
+}
+
+.d3-mem-card.is-open .d3-mem-back {
+  transform: rotateY(180deg);
+}
+
+.d3-mem-card.is-open .d3-mem-front {
+  transform: rotateY(0deg);
+}
+
+.d3-mem-card.is-matched .d3-mem-front {
+  background: #ffe000;
+  box-shadow: 0 0 0 2px #003b1f;
+}
+
+.d3-mem-card:disabled {
+  opacity: 1;
+}
+
+@media (min-width: 768px) {
+  .d3-memory {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .d3-mem-card {
+    min-height: 110px;
+  }
+
+  .d3-mem-front {
+    font-size: 17px;
+  }
+}
+
+/* Eindrapport + aanklacht */
+.finding-list {
+  list-style: none;
+  margin: 16px 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.finding-list label {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(0, 61, 24, 0.08);
+  border: 1px solid rgba(0, 61, 24, 0.16);
+  color: #1a2418;
+  cursor: pointer;
+}
+
+.finding-list input {
+  width: 22px;
+  height: 22px;
+  margin-top: 2px;
+  accent-color: #003b1f;
+}
+
+.people-passes {
+  grid-template-columns: 1fr 1fr;
+}
+
+.people-passes img {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-bottom: 8px;
+  border-radius: 8px;
+}
+
+.suspect-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.suspect {
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+  border-radius: 14px;
+  border: 2px solid rgba(0, 61, 24, 0.18);
+  background: #fffef8;
+  text-align: left;
+  color: #1a2418;
+}
+
+.suspect img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  display: block;
+}
+
+.suspect strong {
+  font-size: 15px;
+}
+
+.suspect span {
+  font-size: 12px;
+  color: #4d5648;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.suspect.is-on {
+  border-color: #ffe000;
+  background: #fff8cc;
+  box-shadow: 0 0 0 2px rgba(255, 224, 0, 0.45);
+}
+
+.finale-hero {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.finale-verdict {
+  display: grid;
+  grid-template-columns: minmax(120px, 180px) 1fr;
+  gap: 14px;
+  align-items: center;
+  margin: 0 0 18px;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255, 224, 0, 0.1);
+  border: 1px solid rgba(255, 224, 0, 0.35);
+}
+
+.finale-verdict img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.finale-verdict h2 {
+  margin: 4px 0 6px;
+  color: #ffe000;
+}
+
+.finale-verdict p {
+  margin: 0;
+}
+
+@media (max-width: 520px) {
+  .finale-verdict {
+    grid-template-columns: 1fr;
+  }
+}

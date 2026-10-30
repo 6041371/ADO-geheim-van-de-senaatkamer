@@ -1,10 +1,18 @@
 export const GAME_MINUTES = 60;
 
 export const PEOPLE = [
-  { name: "Marcel de Vries", role: "Voorzitter" },
-  { name: "Karin Bos", role: "Financiën" },
-  { name: "Tom Albers", role: "Technisch adviseur" },
-  { name: "Sophie van Rijn", role: "Communicatie" },
+  { name: "Marcel de Vries", role: "Voorzitter", pass: "/ado/passes/marcel-de-vries.png" },
+  { name: "Karin Bos", role: "Financiën", pass: "/ado/passes/karin-bos.png" },
+  { name: "Tom Albers", role: "Technisch adviseur", pass: "/ado/passes/tom-albers.png" },
+  { name: "Sophie van Rijn", role: "Communicatie", pass: "/ado/passes/sophie-van-rijn.png" },
+] as const;
+
+export const FINDINGS = [
+  "Twee bestuursleden ontbraken bij aanvang van de vergadering.",
+  "Het embargo stond alleen algemene toekomstplannen toe.",
+  "Het Haags Dagblad publiceerde details uit het vertrouwelijke dossier.",
+  "Digitale sporen leiden naar het werkstation van Tom Albers.",
+  "Het eindrapport is op papier ingevuld en klaar voor aanklacht.",
 ] as const;
 
 export type LevelId = 1 | 2 | 3 | 4 | 5;
