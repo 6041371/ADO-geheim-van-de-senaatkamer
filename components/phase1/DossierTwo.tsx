@@ -340,12 +340,22 @@ function FolderTask({
   );
 }
 
-const PASS_FILE: Record<string, string> = {
-  marcel: "marcel-de-vries",
-  karin: "karin-bos",
-  tom: "tom-albers",
-  sophie: "sophie-van-rijn",
-};
+function PassCard({ name }: { name: string }) {
+  return (
+    <article className="d2-pass-card" aria-label={name}>
+      <img className="d2-pass-logo" src="/ado/logo.svg" alt="" />
+      <div className="d2-pass-main">
+        <strong>{name}</strong>
+        <p>
+          <span>Bestuursvergadering</span>
+          <em>SENAATSKAMER</em>
+        </p>
+      </div>
+      <span className="d2-pass-club">ADO DEN HAAG</span>
+      <i className="d2-pass-bar" aria-hidden="true" />
+    </article>
+  );
+}
 
 function AccessTask({
   onBack,
@@ -405,13 +415,13 @@ function AccessTask({
               if (phase === "bad") setPhase("pick");
             }}
           >
-            <img src={`/ado/passes/${PASS_FILE[person.id]}.png`} alt={`${person.name}, ${person.role}`} />
+            <PassCard name={person.name} />
           </button>
         ))}
       </div>
       <div className={`d2-scanner${phase === "scan" ? " is-scanning" : ""}${phase === "good" ? " is-good" : ""}`}>
         <p className="mg-kicker">Technisch stadionarchief</p>
-        {pass ? <img src={`/ado/passes/${PASS_FILE[pass.id]}.png`} alt="" /> : <p className="d2-scan-empty">Selecteer een toegangspas.</p>}
+        {pass ? <PassCard name={pass.name} /> : <p className="d2-scan-empty">Selecteer een toegangspas.</p>}
         {phase === "scan" ? (
           <>
             <span className="d2-corner is-tl" />
