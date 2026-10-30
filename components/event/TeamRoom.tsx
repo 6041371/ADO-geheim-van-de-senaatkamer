@@ -326,6 +326,7 @@ function TeamStage({ row, degraded, onHome }: { row: TeamRow; degraded: boolean;
       onProgress={save}
       onJump={jump}
       onReplay={replay}
+      onLeave={leave}
     />
   );
 }

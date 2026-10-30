@@ -43,7 +43,7 @@ function Bar({
 }) {
   return (
     <header className="mg-bar">
-      <button className="mg-back" type="button" onClick={onBack} aria-label="Terug naar beginscherm">
+      <button className="mg-back" type="button" onClick={onBack} aria-label="Terug">
         ←
       </button>
       <div>

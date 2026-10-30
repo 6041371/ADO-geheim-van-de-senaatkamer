@@ -64,7 +64,16 @@ function EventApp() {
 
   if (view === "boot" || !session) return <p className="boot">De Senaatskamer wordt geopend.</p>;
   if (view === "instructor") return <InstructorDesk fresh={freshEvent} onHome={() => setView("home")} />;
-  if (view === "team") return <TeamRoom onHome={() => setView("home")} />;
+  if (view === "team") {
+    return (
+      <TeamRoom
+        onHome={() => {
+          setSession((prev) => (prev ? { ...prev, team: null } : prev));
+          setView("home");
+        }}
+      />
+    );
+  }
 
   return (
     <HomeScreen

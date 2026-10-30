@@ -32,6 +32,7 @@ export function PhaseOne({
   notice,
   onProgress,
   onReplay,
+  onLeave,
 }: {
   teamId: string;
   stepIndex: number;
@@ -40,6 +41,7 @@ export function PhaseOne({
   onProgress: (stepIndex: number, phase: Phase) => Promise<boolean>;
   onJump?: (stepIndex: number, phase: Phase) => Promise<boolean>;
   onReplay: () => Promise<boolean>;
+  onLeave: () => void | Promise<void>;
 }) {
   const completed = completedTasks(phase, stepIndex);
   const dossier1Done = dossier1Complete(phase, stepIndex);
@@ -178,7 +180,15 @@ export function PhaseOne({
       <div className="mg-phone">
         {screen === "menu" ? (
           <section className="mg-splash">
-            <Logo className="mg-logo" />
+            <button
+              className="mg-logo-exit"
+              type="button"
+              onClick={() => void onLeave()}
+              aria-label="Terug naar beginscherm om een nieuwe room te starten"
+              title="Nieuwe room"
+            >
+              <Logo className="mg-logo" />
+            </button>
             <h1>
               Het geheim
               <br />
@@ -222,7 +232,7 @@ export function PhaseOne({
 
         {screen === "task" && taskIndex === 0 ? (
           <AttendanceTask
-            onBack={goHome}
+            onBack={() => setScreen("briefing")}
             onSolved={() => solve(1, "playing")}
             onNext={() => {
               setTaskIndex(1);
@@ -270,18 +280,12 @@ export function PhaseOne({
 
         {screen === "walkthrough" ? (
           <section className="mg-walk">
-            <button className="mg-back mg-walk-home" type="button" onClick={goHome} aria-label="Terug naar beginscherm">
-              ←
-            </button>
             <Walkthrough startedAt={startedAt} stepIndex={walkStep} onStepIndex={setWalkStep} />
           </section>
         ) : null}
 
         {screen === "ending" ? (
           <section className="mg-screen mg-ending">
-            <button className="mg-back mg-ending-home" type="button" onClick={goHome} aria-label="Terug naar beginscherm">
-              ←
-            </button>
             <p className="mg-kicker">Dossier 01 afgerond</p>
             <h1>De eerste gebeurtenissen liggen vast</h1>
             <ul>
@@ -306,8 +310,8 @@ export function PhaseOne({
         {notice ? <p className="mg-bad">{notice}</p> : null}
 
         <nav className="mg-nav">
-          <button type="button" className={screen === "menu" ? "is-active" : undefined} onClick={goHome}>
-            {screen === "menu" ? "Start" : "← Start"}
+          <button type="button" onClick={goHome}>
+            Home
           </button>
           <button type="button" onClick={() => setPanel("evidence")}>
             Bewijs

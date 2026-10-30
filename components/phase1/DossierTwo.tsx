@@ -125,7 +125,7 @@ export function DossierTwo({
 function Bar({ kicker, title, step, onBack }: { kicker: string; title: string; step: number; onBack: () => void }) {
   return (
     <header className="mg-bar">
-      <button className="mg-back" type="button" onClick={onBack} aria-label="Terug naar beginscherm">
+      <button className="mg-back" type="button" onClick={onBack} aria-label="Terug">
         ←
       </button>
       <div>
