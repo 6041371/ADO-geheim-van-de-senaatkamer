@@ -66,60 +66,60 @@ export const PRESS_JOURNALISTS: PressJournalist[] = [
     id: "lisa",
     outlet: "Haags Dagblad",
     name: "Lisa Vermeer",
-    x: 36,
-    y: 38,
-    w: 16,
-    h: 28,
+    x: 30,
+    y: 34,
+    w: 18,
+    h: 36,
     bubbleSide: "center",
   },
   {
     id: "mark",
     outlet: "Omroep West",
     name: "Mark de Boer",
-    x: 14,
-    y: 44,
-    w: 15,
-    h: 26,
+    x: 12,
+    y: 42,
+    w: 16,
+    h: 30,
     bubbleSide: "right",
   },
   {
     id: "sander",
     outlet: "AD Sportwereld",
     name: "Sander Kuiper",
-    x: 58,
-    y: 42,
-    w: 15,
-    h: 26,
+    x: 52,
+    y: 40,
+    w: 16,
+    h: 30,
     bubbleSide: "left",
   },
   {
     id: "noor",
     outlet: "Den Haag FM",
     name: "Noor Hassani",
-    x: 24,
-    y: 28,
-    w: 13,
-    h: 22,
+    x: 22,
+    y: 26,
+    w: 14,
+    h: 24,
     bubbleSide: "right",
   },
   {
     id: "tim",
     outlet: "Voetbal International",
     name: "Tim Janssen",
-    x: 70,
-    y: 30,
-    w: 13,
-    h: 24,
+    x: 68,
+    y: 28,
+    w: 14,
+    h: 26,
     bubbleSide: "left",
   },
   {
     id: "eva",
     outlet: "NOS",
     name: "Eva Bergkamp",
-    x: 48,
-    y: 24,
-    w: 12,
-    h: 20,
+    x: 46,
+    y: 22,
+    w: 13,
+    h: 22,
     bubbleSide: "center",
   },
 ];
@@ -224,42 +224,29 @@ export const LEAK_CHOICES = [
 
 export const LEAK_CORRECT = "dossier";
 
-/** Memory: koppel gelekte details aan hun bron. 60 seconden. */
+/** Memory: koppel identieke ADO-bewijsplaatjes. 60 seconden. */
 export const MEMORY_SECONDS = 60;
 
 export const MEMORY_PAIRS = [
-  {
-    pairId: "finance",
-    a: "Financiële ramingen",
-    b: "Alleen in het interne dossier",
-  },
-  {
-    pairId: "tech",
-    a: "Technische details",
-    b: "Niet in de persverklaring",
-  },
-  {
-    pairId: "location",
-    a: "Locatieopties",
-    b: "Gelekt in Haags Dagblad",
-  },
-  {
-    pairId: "embargo",
-    a: "Embargo geschonden",
-    b: "Vóór officiële vrijgave",
-  },
+  { pairId: "mic", label: "Microfoon", image: "/ado/memory/mic.png" },
+  { pairId: "folders", label: "Vertrouwelijk dossier", image: "/ado/memory/folders.png" },
+  { pairId: "newspaper", label: "Haags Dagblad", image: "/ado/memory/newspaper.png" },
+  { pairId: "map", label: "Locatie", image: "/ado/memory/map.png" },
+  { pairId: "laptop", label: "Werkstation", image: "/ado/memory/laptop.png" },
+  { pairId: "camera", label: "Bewakingscamera", image: "/ado/memory/camera.png" },
 ] as const;
 
 export type MemoryCard = {
   id: string;
   pairId: string;
   label: string;
+  image: string;
 };
 
 export function buildMemoryDeck(): MemoryCard[] {
   const cards: MemoryCard[] = MEMORY_PAIRS.flatMap((pair) => [
-    { id: `${pair.pairId}-a`, pairId: pair.pairId, label: pair.a },
-    { id: `${pair.pairId}-b`, pairId: pair.pairId, label: pair.b },
+    { id: `${pair.pairId}-a`, pairId: pair.pairId, label: pair.label, image: pair.image },
+    { id: `${pair.pairId}-b`, pairId: pair.pairId, label: pair.label, image: pair.image },
   ]);
   for (let i = cards.length - 1; i > 0; i -= 1) {
     const j = Math.floor(Math.random() * (i + 1));

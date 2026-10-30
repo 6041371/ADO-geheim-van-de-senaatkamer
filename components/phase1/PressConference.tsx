@@ -133,7 +133,7 @@ export function PressConference({ onBack, onNext }: { onBack: () => void; onNext
       {phase === "briefing" ? (
         <>
           <div className="press-scene is-preview">
-            <img src="/ado/persconferentie.jpg" alt="Perszaal ADO Den Haag vanuit de woordvoerdersstoel" />
+            <img src="/ado/pers-idle.jpg" alt="Perszaal ADO Den Haag vanuit de woordvoerdersstoel" />
           </div>
           <p className="mg-note">
             Je zit achter de microfoons in de ADO-perszaal. Journalisten steken hun hand op. Tik op wie mag
@@ -161,8 +161,17 @@ export function PressConference({ onBack, onNext }: { onBack: () => void; onNext
             </div>
           </div>
 
-          <div className={`press-scene${speaking ? " is-speaking" : ""}`}>
-            <img src="/ado/persconferentie.jpg" alt="Perszaal ADO Den Haag" />
+          <div className={`press-scene${speaking ? " is-speaking" : " is-idle"}`}>
+            <img
+              key={speaking ? "speaking" : "idle"}
+              className="press-scene-photo"
+              src={speaking ? "/ado/pers-speaking.jpg" : "/ado/pers-idle.jpg"}
+              alt={
+                speaking
+                  ? "Journalist stelt een vraag; anderen schrijven mee"
+                  : "Journalist steekt de hand op in de ADO-perszaal"
+              }
+            />
 
             {PRESS_JOURNALISTS.map((journalist) => {
               const question = PRESS_QUESTIONS.find((q) => q.journalistId === journalist.id);
@@ -218,10 +227,13 @@ export function PressConference({ onBack, onNext }: { onBack: () => void; onNext
             </p>
           ) : null}
 
-          {phase === "live" && speaking && activeQuestion ? (
+          {phase === "live" && speaking && activeQuestion && activeJournalist ? (
             <div className="press-desk">
-              <p className="mg-kicker">Publicatiecheck</p>
-              <p>Mag dit openbaar, of blijft het intern?</p>
+              <p className="mg-kicker">
+                {activeJournalist.name} · {activeJournalist.outlet}
+              </p>
+              <p className="press-question">{activeQuestion.prompt}</p>
+              <p className="press-ask">Mag dit openbaar, of blijft het intern?</p>
               <div className="press-verdicts">
                 <button
                   type="button"

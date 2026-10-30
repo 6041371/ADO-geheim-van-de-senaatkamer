@@ -3974,12 +3974,21 @@ p.story,
 }
 
 .d3-mem-front {
-  background: #f3e8d0;
+  background: #0a120e;
   color: #1a2418;
   font-size: 15px;
   font-weight: 700;
   transform: rotateY(180deg);
-  border: 1px solid rgba(26, 36, 24, 0.18);
+  border: 1px solid rgba(255, 224, 0, 0.28);
+  padding: 8px;
+}
+
+.d3-mem-front img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
 }
 
 .d3-mem-card.is-open .d3-mem-back {
@@ -4165,17 +4174,31 @@ p.story,
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
 }
 
-.press-scene img {
+.press-scene img,
+.press-scene-photo {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
   transform: scale(1.02);
-  transition: filter 0.35s ease, transform 0.5s ease;
+  animation: press-fade 0.45s ease;
 }
 
-.press-scene.is-speaking img {
-  filter: brightness(0.78) saturate(1.05);
+.press-scene.is-speaking {
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.45),
+    0 0 0 2px rgba(255, 224, 0, 0.35);
+}
+
+@keyframes press-fade {
+  from {
+    opacity: 0.35;
+    transform: scale(1.04);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.02);
+  }
 }
 
 .press-hotspot {
@@ -4245,10 +4268,18 @@ p.story,
   padding: 12px 14px 14px;
   border-radius: 16px;
   background: #fffef8;
-  color: #1a2418;
+  color: #121a14 !important;
   border: 2px solid #ffe000;
   box-shadow: 0 14px 30px rgba(0, 0, 0, 0.4);
   animation: press-pop 0.28s ease-out;
+}
+
+.mg-screen .press-bubble,
+.mg-screen .press-bubble p,
+.d3-screen .press-bubble,
+.d3-screen .press-bubble p {
+  color: #121a14 !important;
+  -webkit-text-fill-color: #121a14;
 }
 
 .press-bubble::after {
@@ -4278,14 +4309,17 @@ p.story,
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #004d28;
+  color: #004d28 !important;
+  -webkit-text-fill-color: #004d28;
 }
 
 .press-bubble p:last-child {
   margin: 0;
   font-size: clamp(15px, 3.4vw, 18px);
   line-height: 1.35;
-  font-weight: 650;
+  font-weight: 700;
+  color: #121a14 !important;
+  -webkit-text-fill-color: #121a14;
 }
 
 .press-desk {
@@ -4296,6 +4330,26 @@ p.story,
   background: #10281c;
   border: 1px solid rgba(255, 224, 0, 0.28);
   color: #fff;
+}
+
+.mg-screen .press-desk .press-question,
+.press-desk .press-question {
+  margin: 0;
+  color: #fffef8 !important;
+  -webkit-text-fill-color: #fffef8;
+  font-size: clamp(17px, 3.6vw, 22px);
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.press-desk .press-ask {
+  margin: 0;
+  color: #ffe000 !important;
+  -webkit-text-fill-color: #ffe000;
+  font-family: var(--font-label), Impact, sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 13px;
 }
 
 .press-verdicts {

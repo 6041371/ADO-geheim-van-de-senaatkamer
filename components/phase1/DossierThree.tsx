@@ -310,8 +310,7 @@ function LeakTask({ onBack, onFinished }: { onBack: () => void; onFinished: () =
     <section className="mg-screen d3-screen">
       <Bar kicker="Dossier 03 · Opdracht 9" title="Wat werd er gelekt?" step={2} onBack={onBack} />
       <p className="mg-note">
-        Memory: koppel elk gelekt detail aan de juiste bron. Zo bewijs je dat de informatie uit het vertrouwelijke
-        stadiondossier kwam — niet uit de goedgekeurde persverklaring.
+        Memory: vind binnen 60 seconden de paren. De plaatjes horen bij het lek — dossier, media en digitale sporen.
       </p>
 
       <div className={`d3-timer ${seconds <= 10 && running ? "is-low" : ""} ${timedOut ? "is-out" : ""}`}>
@@ -337,7 +336,9 @@ function LeakTask({ onBack, onFinished }: { onBack: () => void; onFinished: () =
               disabled={!running || timedOut || won || lock}
             >
               <span className="d3-mem-back">ADO</span>
-              <span className="d3-mem-front">{card.label}</span>
+              <span className="d3-mem-front">
+                <img src={card.image} alt={card.label} />
+              </span>
             </button>
           );
         })}
