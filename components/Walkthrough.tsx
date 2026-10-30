@@ -10,6 +10,7 @@ import {
   type ChoiceQuestion,
   type OrderQuestion,
 } from "@/lib/game";
+import { shuffle } from "@/lib/shuffle";
 
 function formatTime(ms: number) {
   const total = Math.max(0, Math.ceil(ms / 1000));
@@ -250,11 +251,13 @@ function ChoiceCard({
   onCheck: () => void;
   onNext: () => void;
 }) {
+  const options = useMemo(() => shuffle(step.choices), [step.id]);
+
   return (
     <article className="paper">
       <Story step={step} />
       <div className="choices" role="radiogroup" aria-label={step.prompt}>
-        {step.choices.map((choice) => (
+        {options.map((choice) => (
           <button
             key={choice.id}
             className={`choice${selected === choice.id ? " is-on" : ""}`}
@@ -295,12 +298,13 @@ function OrderCard({
   onNext: () => void;
 }) {
   const labels = useMemo(() => new Map(step.items.map((item) => [item.id, item.label])), [step.items]);
+  const options = useMemo(() => shuffle(step.items), [step.id]);
 
   return (
     <article className="paper">
       <Story step={step} />
       <div className="choices">
-        {step.items.map((item) => (
+        {options.map((item) => (
           <button
             key={item.id}
             className="choice"

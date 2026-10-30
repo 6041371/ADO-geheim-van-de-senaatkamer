@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   LEAK_CHOICES,
   LEAK_CORRECT,
@@ -8,6 +8,7 @@ import {
   PROTOCOL_CHOICES,
   PROTOCOL_CORRECT,
 } from "@/lib/level3";
+import { shuffle } from "@/lib/shuffle";
 import { playCorrect, playDenied } from "./sounds";
 
 type Task = 7 | 8 | 9;
@@ -86,6 +87,7 @@ function PressTask({ onBack, onNext }: { onBack: () => void; onNext: () => void 
   const [choice, setChoice] = useState<string | null>(null);
   const [wrong, setWrong] = useState(false);
   const [correct, setCorrect] = useState(false);
+  const options = useMemo(() => shuffle(PRESS_CHOICES), []);
 
   function check() {
     if (!choice) return;
@@ -160,7 +162,7 @@ function PressTask({ onBack, onNext }: { onBack: () => void; onNext: () => void 
         <p className="mg-kicker">Publicatiecheck</p>
         <p>Wat mocht volgens de afspraken openbaar worden gemaakt?</p>
         <div className="d3-choices">
-          {PRESS_CHOICES.map((item) => (
+          {options.map((item) => (
             <button
               key={item.id}
               type="button"
@@ -202,6 +204,7 @@ function ProtocolTask({ onBack, onNext }: { onBack: () => void; onNext: () => vo
   const [wrong, setWrong] = useState(false);
   const [correct, setCorrect] = useState(false);
   const [zoom, setZoom] = useState<"memo" | "paper" | null>(null);
+  const options = useMemo(() => shuffle(PROTOCOL_CHOICES), []);
 
   function check() {
     if (!choice) return;
@@ -276,7 +279,7 @@ function ProtocolTask({ onBack, onNext }: { onBack: () => void; onNext: () => vo
         <p className="mg-kicker">Welke communicatieregel is mogelijk overtreden?</p>
         <p>Bekijk de fysieke interne memo. Welke afspraak was gemaakt over het delen van informatie?</p>
         <div className="d3-choices">
-          {PROTOCOL_CHOICES.map((item) => (
+          {options.map((item) => (
             <button
               key={item.id}
               type="button"
@@ -349,6 +352,7 @@ function LeakTask({ onBack, onFinished }: { onBack: () => void; onFinished: () =
   const [choice, setChoice] = useState<string | null>(null);
   const [wrong, setWrong] = useState(false);
   const [correct, setCorrect] = useState(false);
+  const options = useMemo(() => shuffle(LEAK_CHOICES), []);
 
   function check() {
     if (!choice) return;
@@ -397,7 +401,7 @@ function LeakTask({ onBack, onFinished }: { onBack: () => void; onFinished: () =
         <p className="mg-kicker">Bron van het lek</p>
         <p>Waar kwam de gelekte informatie vandaan?</p>
         <div className="d3-choices">
-          {LEAK_CHOICES.map((item) => (
+          {options.map((item) => (
             <button
               key={item.id}
               type="button"
