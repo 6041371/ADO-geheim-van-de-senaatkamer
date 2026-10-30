@@ -245,10 +245,18 @@ function PollingHost({
       const response = await getJson<{ rows: HostRow[] }>("/api/snapshot/host");
       if (!ignore && response.ok) setRows(asHostRows(response.data.rows));
     };
+    void tick();
     const timer = window.setInterval(() => void tick(), 1500);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") void tick();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onVisible);
     return () => {
       ignore = true;
       window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onVisible);
     };
   }, []);
   return <InstructorPanel rows={rows} degraded accessOnce={accessOnce} onNoted={onNoted} onHome={onHome} onReplace={onReplace} onRows={setRows} />;
@@ -281,12 +289,12 @@ function RealtimeHost({
   const [rows, setRows] = useState(initialRows);
 
   useEffect(() => {
-    if (live.status === "error" || !live.data) return;
+    if (!live.data) return;
     setRows(asHostRows(live.data as unknown as Record<string, unknown>[]));
-  }, [live.data, live.status]);
+  }, [live.data]);
 
+  // Altijd pollen naast realtime, anders verschijnen joins/start niet tot een handmatige refresh.
   useEffect(() => {
-    if (live.status !== "error") return;
     let ignore = false;
     const tick = async () => {
       const response = await getJson<{ rows: HostRow[] }>("/api/snapshot/host");
@@ -294,16 +302,23 @@ function RealtimeHost({
     };
     void tick();
     const timer = window.setInterval(() => void tick(), 1500);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") void tick();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onVisible);
     return () => {
       ignore = true;
       window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onVisible);
     };
-  }, [live.status]);
+  }, []);
 
   return (
     <InstructorPanel
       rows={rows}
-      degraded={live.status === "error"}
+      degraded={live.status === "error" || live.status === "stale"}
       accessOnce={accessOnce}
       onNoted={onNoted}
       onHome={onHome}

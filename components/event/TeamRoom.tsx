@@ -118,10 +118,18 @@ function PollingTeam({ row, onHome }: { row: TeamRow; onHome: () => void }) {
       const response = await getJson<{ row: TeamRow }>("/api/snapshot/team");
       if (!ignore && response.ok) setCurrent(asTeamRow(response.data.row));
     };
+    void tick();
     const timer = window.setInterval(() => void tick(), 1500);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") void tick();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onVisible);
     return () => {
       ignore = true;
       window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onVisible);
     };
   }, []);
   return <TeamStage row={current} degraded onHome={onHome} />;
@@ -145,27 +153,37 @@ function RealtimeTeam({
     return response.data.sealedQuery;
   }, []);
   const live = useLiveQuery(query, { refreshQuery, initialData: [initialRow] });
-  const [fallback, setFallback] = useState<TeamRow | null>(null);
+  const [row, setRow] = useState(initialRow);
 
   useEffect(() => {
-    if (live.status !== "error") return;
+    const fromLive = live.data?.[0] ? asTeamRow(live.data[0] as unknown as Record<string, unknown>) : null;
+    if (fromLive) setRow(fromLive);
+  }, [live.data]);
+
+  // Altijd pollen: iPad/Safari mist soms Neon-updates; zonder poll blijft lobby hangen tot refresh.
+  useEffect(() => {
     let ignore = false;
     const tick = async () => {
       const response = await getJson<{ row: TeamRow }>("/api/snapshot/team");
       if (!response.ok || ignore) return;
-      setFallback(asTeamRow(response.data.row));
+      setRow(asTeamRow(response.data.row));
     };
     void tick();
-    const timer = window.setInterval(() => void tick(), 2000);
+    const timer = window.setInterval(() => void tick(), 1500);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") void tick();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onVisible);
     return () => {
       ignore = true;
       window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onVisible);
     };
-  }, [live.status]);
+  }, []);
 
-  const fromLive = live.data?.[0] ? asTeamRow(live.data[0] as unknown as Record<string, unknown>) : null;
-  const row = live.status === "error" ? (fallback ?? initialRow) : (fromLive ?? initialRow);
-  return <TeamStage row={row} degraded={live.status === "error"} onHome={onHome} />;
+  return <TeamStage row={row} degraded={live.status === "error" || live.status === "stale"} onHome={onHome} />;
 }
 
 function TeamStage({ row, degraded, onHome }: { row: TeamRow; degraded: boolean; onHome: () => void }) {
