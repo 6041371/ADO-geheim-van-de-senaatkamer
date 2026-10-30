@@ -64,9 +64,31 @@ function Bar({
   );
 }
 
+const PRESS_CHOICES = [
+  { id: "algemeen", label: "Alleen de algemene toekomstplannen" },
+  { id: "financieel", label: "De financiële ramingen" },
+  { id: "technisch", label: "De technische details van het stadiondossier" },
+] as const;
+
+const PRESS_CORRECT = "algemeen";
+
 function PressTask({ onBack, onNext }: { onBack: () => void; onNext: () => void }) {
   const [opened, setOpened] = useState(false);
-  const [done, setDone] = useState(false);
+  const [choice, setChoice] = useState<string | null>(null);
+  const [wrong, setWrong] = useState(false);
+  const [correct, setCorrect] = useState(false);
+
+  function check() {
+    if (!choice) return;
+    if (choice === PRESS_CORRECT) {
+      setWrong(false);
+      setCorrect(true);
+      playCorrect();
+      return;
+    }
+    setWrong(true);
+    playDenied();
+  }
 
   return (
     <section className="mg-screen d3-screen">
@@ -114,36 +136,29 @@ function PressTask({ onBack, onNext }: { onBack: () => void; onNext: () => void 
         <p className="mg-kicker">Publicatiecheck</p>
         <p>Wat mocht volgens de afspraken openbaar worden gemaakt?</p>
         <div className="d3-choices">
-          <button
-            type="button"
-            className={done ? "is-on" : ""}
-            onClick={() => {
-              playCorrect();
-              setDone(true);
-            }}
-          >
-            Alleen de algemene toekomstplannen
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              playDenied();
-            }}
-          >
-            De financiële ramingen
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              playDenied();
-            }}
-          >
-            De technische details van het stadiondossier
-          </button>
+          {PRESS_CHOICES.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              className={choice === item.id ? "is-on" : ""}
+              onClick={() => {
+                setChoice(item.id);
+                setWrong(false);
+              }}
+            >
+              {item.label}
+            </button>
+          ))}
         </div>
+        {wrong ? <p className="mg-bad">Klopt niet. Kijk opnieuw wat in de conceptverklaring openbaar mocht en wat zwartgelakt bleef.</p> : null}
+        {!correct ? (
+          <button className="mg-yellow mg-cta" type="button" disabled={!choice} onClick={check}>
+            Controleer antwoord
+          </button>
+        ) : null}
       </div>
 
-      {done ? (
+      {correct ? (
         <div className="mg-success">
           <p className="mg-kicker">Persconferentie afgerond</p>
           <p>
