@@ -3106,6 +3106,24 @@ p.story,
     0 1px 0 rgba(255, 255, 255, 0.35) inset;
 }
 
+/* Overschrijf .mg-screen p (lichte tekst) — documenten moeten donkere inkt hebben */
+.mg-screen .d3-doc,
+.mg-screen .d3-doc p,
+.mg-screen .d3-doc li,
+.mg-screen .d3-doc span,
+.mg-screen .d3-doc strong,
+.mg-screen .d3-doc em,
+.mg-screen .d3-doc h2,
+.mg-screen .d3-doc h3,
+.mg-screen .d3-notes,
+.mg-screen .d3-notes p,
+.mg-screen .d3-notes span,
+.mg-screen .d3-zoom-sheet,
+.mg-screen .d3-zoom-sheet p,
+.mg-screen .d3-zoom-sheet h3 {
+  color: #1a2418;
+}
+
 .d3-doc-letter,
 .d3-doc-memo {
   padding: 18px 16px 14px;
@@ -3157,7 +3175,7 @@ p.story,
   display: block;
 }
 
-.d3-doc-letterhead strong {
+.mg-screen .d3-doc-letterhead strong {
   font-family: var(--font-label), Impact, sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -3165,16 +3183,16 @@ p.story,
   color: #003b1f;
 }
 
-.d3-doc-letterhead span {
+.mg-screen .d3-doc-letterhead span {
   font-size: 13px;
-  color: #3d4a3a;
+  color: #2f3a2c;
 }
 
-.d3-doc-letterhead em {
+.mg-screen .d3-doc-letterhead em {
   margin-top: 2px;
   font-style: normal;
   font-size: 11px;
-  color: #6a7464;
+  color: #4a5548;
 }
 
 .d3-stamp-ink {
@@ -3197,7 +3215,7 @@ p.story,
   color: #9a3412;
 }
 
-.d3-doc-ref {
+.mg-screen .d3-doc-ref {
   position: relative;
   z-index: 1;
   margin: 0 0 8px;
@@ -3205,12 +3223,12 @@ p.story,
   font-size: 12px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #5a6558;
+  color: #3d4a3a;
 }
 
-.d3-doc-letter h2,
-.d3-doc-memo h3,
-.d3-doc-news h3 {
+.mg-screen .d3-doc-letter h2,
+.mg-screen .d3-doc-memo h3,
+.mg-screen .d3-doc-news h3 {
   position: relative;
   z-index: 1;
   margin: 0 0 10px;
@@ -3220,7 +3238,7 @@ p.story,
   color: #102016;
 }
 
-.d3-doc-body {
+.mg-screen .d3-doc-body {
   position: relative;
   z-index: 1;
   margin: 0 0 10px;
@@ -3260,7 +3278,8 @@ p.story,
 .d3-redact-block i:nth-child(3) { width: 92%; }
 .d3-redact-block i:nth-child(4) { width: 64%; }
 
-.d3-doc-foot {
+.mg-screen .d3-doc-foot,
+.mg-screen .d3-doc-foot span {
   position: relative;
   z-index: 1;
   display: flex;
@@ -3270,10 +3289,17 @@ p.story,
   padding-top: 10px;
   border-top: 1px solid rgba(26, 36, 24, 0.18);
   font-size: 11px;
-  color: #5a6558;
+  color: #3d4a3a;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   font-family: var(--font-label), Impact, sans-serif;
+}
+
+.mg-screen .d3-doc-foot span {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: inline;
 }
 
 .d3-reveal,
@@ -3316,9 +3342,50 @@ p.story,
   align-items: baseline;
 }
 
-.d3-notes header span {
+.mg-screen .d3-notes header span {
   font-size: 12px;
-  color: #6a5a28;
+  color: #5a4a18;
+}
+
+.mg-screen .d3-redact-block span {
+  color: #ffe000;
+}
+
+.mg-screen .d3-stamp-ink {
+  color: #9d1c1c;
+}
+
+.mg-screen .d3-stamp-ink.is-warn {
+  color: #9a3412;
+}
+
+.mg-screen .d3-memo-top span,
+.mg-screen .d3-memo-list strong {
+  color: #003b1f;
+}
+
+.mg-screen .d3-memo-list span {
+  color: #1a2418;
+}
+
+.mg-screen .d3-news-mast strong {
+  color: #102016;
+}
+
+.mg-screen .d3-news-mast span {
+  color: #3d4a3a;
+}
+
+.mg-screen .d3-news-lead {
+  color: #102016;
+}
+
+.mg-screen .d3-news-cols p {
+  color: #1a2418;
+}
+
+.mg-screen .d3-note-chips span {
+  color: #ffe000;
 }
 
 .d3-note-chips {
