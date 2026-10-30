@@ -808,13 +808,14 @@ p.story,
 }
 
 .mg-back {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   padding: 0;
-  border: 0;
-  background: transparent;
+  border: 1px solid rgba(255, 224, 0, 0.45);
+  border-radius: 10px;
+  background: rgba(255, 224, 0, 0.12);
   color: #ffe000;
-  font-size: 38px;
+  font-size: 28px;
   line-height: 1;
 }
 
@@ -1182,6 +1183,32 @@ p.story,
   letter-spacing: 0.08em;
   font-size: 15px;
   text-transform: uppercase;
+}
+
+.mg-nav button.is-active {
+  color: #fff;
+  box-shadow: inset 0 -3px 0 #ffe000;
+}
+
+.mg-walk {
+  position: relative;
+}
+
+.mg-walk-home,
+.mg-ending-home {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 5;
+}
+
+.mg-ending {
+  position: relative;
+}
+
+.mg-ending-home {
+  top: 10px;
+  left: 10px;
 }
 
 .mg-room {

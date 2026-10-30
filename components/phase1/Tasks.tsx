@@ -27,8 +27,8 @@ function ScreenBar({
   return (
     <header className="mg-bar">
       {onBack ? (
-        <button className="mg-back" type="button" onClick={onBack} aria-label="Terug">
-          ‹
+        <button className="mg-back" type="button" onClick={onBack} aria-label="Terug naar beginscherm">
+          ←
         </button>
       ) : (
         <span />

@@ -158,6 +158,12 @@ export function PhaseOne({
     return onProgress(nextStep, nextPhase);
   }
 
+  function goHome() {
+    setPanel(null);
+    setBanner(null);
+    setScreen("menu");
+  }
+
   if (!ready) return <p className="boot">Jullie onderzoek wordt hervat.</p>;
   if (!introSeen || replay) return <IntroFilm onDone={finishIntro} />;
 
@@ -212,11 +218,11 @@ export function PhaseOne({
           </section>
         ) : null}
 
-        {screen === "briefing" ? <RoomBriefing onBack={() => setScreen("menu")} onStart={() => setScreen("task")} /> : null}
+        {screen === "briefing" ? <RoomBriefing onBack={goHome} onStart={() => setScreen("task")} /> : null}
 
         {screen === "task" && taskIndex === 0 ? (
           <AttendanceTask
-            onBack={() => setScreen("briefing")}
+            onBack={goHome}
             onSolved={() => solve(1, "playing")}
             onNext={() => {
               setTaskIndex(1);
@@ -225,7 +231,7 @@ export function PhaseOne({
         ) : null}
         {screen === "task" && taskIndex === 1 ? (
           <MinutesTask
-            onBack={() => setScreen("menu")}
+            onBack={goHome}
             onSolved={() => solve(2, "playing")}
             onNext={() => {
               setTaskIndex(2);
@@ -233,7 +239,7 @@ export function PhaseOne({
           />
         ) : null}
         {screen === "task" && taskIndex === 2 ? (
-          <TimeTask onBack={() => setScreen("menu")} onSolved={() => solve(2, "done")} onFinished={() => setScreen("ending")} />
+          <TimeTask onBack={goHome} onSolved={() => solve(2, "done")} onFinished={() => setScreen("ending")} />
         ) : null}
 
         {screen === "dossier2" ? (
@@ -242,7 +248,7 @@ export function PhaseOne({
             phase={phase}
             stepIndex={stepIndex}
             onProgress={onProgress}
-            onMenu={() => setScreen("menu")}
+            onMenu={goHome}
             onTask={rememberTask}
             startTask={forcedDossierTask ?? undefined}
           />
@@ -253,23 +259,29 @@ export function PhaseOne({
             phase={phase}
             stepIndex={stepIndex}
             onProgress={onProgress}
-            onMenu={() => setScreen("menu")}
+            onMenu={goHome}
             onTask={rememberTask}
           />
         ) : null}
 
         {screen === "dossier3" ? (
-          <DossierThree key={`d3-${embargoTask}`} startTask={embargoTask} onMenu={() => setScreen("menu")} />
+          <DossierThree key={`d3-${embargoTask}`} startTask={embargoTask} onMenu={goHome} />
         ) : null}
 
         {screen === "walkthrough" ? (
           <section className="mg-walk">
+            <button className="mg-back mg-walk-home" type="button" onClick={goHome} aria-label="Terug naar beginscherm">
+              ←
+            </button>
             <Walkthrough startedAt={startedAt} stepIndex={walkStep} onStepIndex={setWalkStep} />
           </section>
         ) : null}
 
         {screen === "ending" ? (
           <section className="mg-screen mg-ending">
+            <button className="mg-back mg-ending-home" type="button" onClick={goHome} aria-label="Terug naar beginscherm">
+              ←
+            </button>
             <p className="mg-kicker">Dossier 01 afgerond</p>
             <h1>De eerste gebeurtenissen liggen vast</h1>
             <ul>
@@ -294,8 +306,8 @@ export function PhaseOne({
         {notice ? <p className="mg-bad">{notice}</p> : null}
 
         <nav className="mg-nav">
-          <button type="button" onClick={() => setScreen("menu")}>
-            Home
+          <button type="button" className={screen === "menu" ? "is-active" : undefined} onClick={goHome}>
+            {screen === "menu" ? "Start" : "← Start"}
           </button>
           <button type="button" onClick={() => setPanel("evidence")}>
             Bewijs
