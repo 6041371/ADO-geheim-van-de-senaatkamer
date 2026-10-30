@@ -4,7 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { DOSSIERS, EVIDENCE, HINTS, LOCKED_MESSAGE, completedTasks, type HintSet } from "@/lib/level1";
 import { DOSSIER2_EVIDENCE, DOSSIER2_HINTS, dossier1Complete, dossier2Complete, dossier2DoneCount } from "@/lib/level2";
 import type { Phase } from "@/lib/events/types";
-import { firstWalkStepForLevel, type GameScreen } from "@/lib/walkthrough-jumps";
+import { type GameScreen } from "@/lib/walkthrough-jumps";
 import { Logo } from "@/components/Logo";
 import { Walkthrough } from "@/components/Walkthrough";
 import { DossierThree } from "./DossierThree";
@@ -126,14 +126,7 @@ export function PhaseOne({
       return;
     }
     if (id >= 4) {
-      if (!dossier2Done) {
-        setBanner(LOCKED_MESSAGE);
-        return;
-      }
-      setBanner(null);
-      setForcedDossierTask(null);
-      setWalkStep(firstWalkStepForLevel(id));
-      setScreen("walkthrough");
+      setBanner(LOCKED_MESSAGE);
       return;
     }
     if (id !== 1) {
@@ -506,10 +499,6 @@ function dossierStatus(id: number, dossier1Done: boolean, dossier2Done: boolean)
     return "Vergrendeld";
   }
   if (id === 3) {
-    if (dossier2Done) return "Ontgrendeld";
-    return "Vergrendeld";
-  }
-  if (id >= 4) {
     if (dossier2Done) return "Ontgrendeld";
     return "Vergrendeld";
   }
