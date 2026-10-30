@@ -39,10 +39,10 @@ export function PressConference({ onBack, onNext }: { onBack: () => void; onNext
     ? PRESS_JOURNALISTS.find((j) => j.id === activeQuestion.journalistId)
     : null;
 
-  const waitingIds = useMemo(() => {
-    const ids = new Set(remaining.map((q) => q.journalistId));
-    return PRESS_JOURNALISTS.filter((j) => ids.has(j.id)).map((j) => j.id);
-  }, [remaining]);
+  const waitingIds = useMemo(
+    () => PRESS_JOURNALISTS.filter((j) => remaining.some((q) => q.journalistId === j.id)).map((j) => j.id),
+    [remaining],
+  );
 
   function callOn(journalistId: string) {
     if (phase !== "live" || speaking || feedback) return;
