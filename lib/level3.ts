@@ -23,9 +23,9 @@ export function dossier5Complete(_phase: Phase, step: number) {
 
 export const DOSSIER3_HINTS: Record<7 | 8 | 9, HintSet> = {
   7: {
-    props: "Beantwoord de zes persvragen. Pak daarna de conceptpersverklaring en vergelijk die met de sleutelwoorden.",
-    hint1: "Alleen algemene toekomstplannen mochten openbaar. Financiële en technische details bleven intern.",
-    hint2: "De drie sleutelwoorden horen bij de openbare boodschap, niet bij het vertrouwelijke dossier.",
+    props: "Tik op journalisten die de hand opsteken. Kies per vraag: geschikt voor publicatie of alleen intern.",
+    hint1: "Algemene toekomstplannen mogen openbaar. Financiële en technische details blijven intern.",
+    hint2: "Na zes vragen vul je AKKOORD, STABILITEIT en LOCATIE in de conceptpersverklaring.",
   },
   8: {
     props: "Pak de interne memo (communicatieprotocol) en het Haags Dagblad.",
@@ -40,92 +40,160 @@ export const DOSSIER3_HINTS: Record<7 | 8 | 9, HintSet> = {
 };
 
 export const PRESS_KEYWORDS = [
-  { id: "locatie", label: "Locatie" },
-  { id: "akkoord", label: "Akkoord" },
-  { id: "stabiliteit", label: "Stabiliteit" },
+  { id: "akkoord", label: "AKKOORD" },
+  { id: "stabiliteit", label: "STABILITEIT" },
+  { id: "locatie", label: "LOCATIE" },
 ] as const;
 
-/** Zes journalisten-vragen tijdens de officiële persconferentie. */
+export type PressVerdict = "publicatie" | "intern";
+
+export type PressJournalist = {
+  id: string;
+  outlet: string;
+  name: string;
+  /** Hotspot op de perszaalfoto, percentages van breedte/hoogte. */
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  /** Waar de tekstballon boven de hotspot hangt. */
+  bubbleSide: "left" | "right" | "center";
+};
+
+/** Zes journalisten in de ADO-perszaal (klikbare hotspots). */
+export const PRESS_JOURNALISTS: PressJournalist[] = [
+  {
+    id: "lisa",
+    outlet: "Haags Dagblad",
+    name: "Lisa Vermeer",
+    x: 36,
+    y: 38,
+    w: 16,
+    h: 28,
+    bubbleSide: "center",
+  },
+  {
+    id: "mark",
+    outlet: "Omroep West",
+    name: "Mark de Boer",
+    x: 14,
+    y: 44,
+    w: 15,
+    h: 26,
+    bubbleSide: "right",
+  },
+  {
+    id: "sander",
+    outlet: "AD Sportwereld",
+    name: "Sander Kuiper",
+    x: 58,
+    y: 42,
+    w: 15,
+    h: 26,
+    bubbleSide: "left",
+  },
+  {
+    id: "noor",
+    outlet: "Den Haag FM",
+    name: "Noor Hassani",
+    x: 24,
+    y: 28,
+    w: 13,
+    h: 22,
+    bubbleSide: "right",
+  },
+  {
+    id: "tim",
+    outlet: "Voetbal International",
+    name: "Tim Janssen",
+    x: 70,
+    y: 30,
+    w: 13,
+    h: 24,
+    bubbleSide: "left",
+  },
+  {
+    id: "eva",
+    outlet: "NOS",
+    name: "Eva Bergkamp",
+    x: 48,
+    y: 24,
+    w: 12,
+    h: 20,
+    bubbleSide: "center",
+  },
+];
+
+/**
+ * Publicatiecheck: beoordeel of het antwoord/onderwerp openbaar mag.
+ * correct = "publicatie" | "intern"
+ */
 export const PRESS_QUESTIONS = [
   {
     id: "q1",
-    journalist: "Haags Dagblad",
-    prompt: "Wat mag ADO Den Haag vandaag officieel delen over het stadion?",
-    choices: [
-      { id: "algemeen", label: "Alleen algemene toekomstplannen" },
-      { id: "financieel", label: "De volledige financiële ramingen" },
-      { id: "technisch", label: "Technische details van het dossier" },
-    ],
-    correctId: "algemeen",
+    journalistId: "lisa",
+    prompt: "Kunnen jullie vandaag al de exacte financiële ramingen voor het stadion vrijgeven?",
+    correct: "intern" as PressVerdict,
     keywordId: null,
-    reveal: "De woordvoerder blijft bij de goedgekeurde lijn: alleen algemene toekomstplannen.",
+    feedbackOk: "Juist. Financiële ramingen blijven achter de zwarte strepen — alleen intern.",
+    feedbackBad: "Fout. Exacte ramingen horen niet in de openbare verklaring.",
   },
   {
     id: "q2",
-    journalist: "Omroep West",
-    prompt: "Welk sleutelwoord vat de boodschap over de plek van de club samen?",
-    choices: [
-      { id: "locatie", label: "Locatie" },
-      { id: "verhuizing", label: "Verhuizing" },
-      { id: "sloop", label: "Sloop" },
-    ],
-    correctId: "locatie",
+    journalistId: "mark",
+    prompt: "ADO werkt aan de toekomst van de club en het stadion. Mag die algemene boodschap naar buiten?",
+    correct: "publicatie" as PressVerdict,
     keywordId: "locatie" as const,
-    reveal: "Sleutelwoord vastgelegd: Locatie.",
+    feedbackOk: "Juist. Algemene toekomstplannen mogen. Sleutelwoord vastgelegd: LOCATIE.",
+    feedbackBad: "Fout. De algemene toekomstboodschap is juist geschikt voor publicatie.",
   },
   {
     id: "q3",
-    journalist: "AD Sportwereld",
-    prompt: "Wat blijft volgens het embargo bewust intern?",
-    choices: [
-      { id: "ramingen", label: "Financiële ramingen en technische specificaties" },
-      { id: "clubnaam", label: "De clubnaam" },
-      { id: "kleuren", label: "De clubkleuren" },
-    ],
-    correctId: "ramingen",
+    journalistId: "sander",
+    prompt: "Mogen we de technische specificaties en constructiedetails al opnemen in ons artikel?",
+    correct: "intern" as PressVerdict,
     keywordId: null,
-    reveal: "Ramingen en techniek blijven achter de zwarte strepen tot er een besluit is.",
+    feedbackOk: "Juist. Technische details blijven vertrouwelijk tot een bestuursbesluit.",
+    feedbackBad: "Fout. Technische details zijn embargo — alleen intern.",
   },
   {
     id: "q4",
-    journalist: "Den Haag FM",
-    prompt: "Welk sleutelwoord hoort bij het proces met bestuur en partners?",
-    choices: [
-      { id: "akkoord", label: "Akkoord" },
-      { id: "ruzie", label: "Ruzie" },
-      { id: "staking", label: "Staking" },
-    ],
-    correctId: "akkoord",
+    journalistId: "noor",
+    prompt: "Jullie zoeken overeenstemming met partners over het proces. Mag het woord ‘akkoord’ in die zin openbaar?",
+    correct: "publicatie" as PressVerdict,
     keywordId: "akkoord" as const,
-    reveal: "Sleutelwoord vastgelegd: Akkoord.",
+    feedbackOk: "Juist. Het proceswoord AKKOORD mag in de openbare lijn. Sleutelwoord vastgelegd.",
+    feedbackBad: "Fout. ‘Akkoord’ als procesboodschap mag wél openbaar.",
   },
   {
     id: "q5",
-    journalist: "Voetbal International",
-    prompt: "Welk sleutelwoord gebruiken jullie voor de lijn van de club?",
-    choices: [
-      { id: "stabiliteit", label: "Stabiliteit" },
-      { id: "chaos", label: "Chaos" },
-      { id: "crisis", label: "Crisis" },
-    ],
-    correctId: "stabiliteit",
+    journalistId: "tim",
+    prompt: "Mag ADO benadrukken dat de club inzet op stabiliteit richting supporters en stad?",
+    correct: "publicatie" as PressVerdict,
     keywordId: "stabiliteit" as const,
-    reveal: "Sleutelwoord vastgelegd: Stabiliteit.",
+    feedbackOk: "Juist. STABILITEIT is onderdeel van de goedgekeurde boodschap.",
+    feedbackBad: "Fout. Stabiliteit mag juist naar buiten als openbare lijn.",
   },
   {
     id: "q6",
-    journalist: "NOS",
-    prompt: "Wanneer mogen technische details naar buiten?",
-    choices: [
-      { id: "na-besluit", label: "Pas na een definitief bestuursbesluit" },
-      { id: "nu", label: "Meteen na deze persconferentie" },
-      { id: "nooit", label: "Nooit, ook niet na een besluit" },
-    ],
-    correctId: "na-besluit",
+    journalistId: "eva",
+    prompt: "Kunnen jullie al concrete interne locatieopties en scenario’s uit het dossier delen?",
+    correct: "intern" as PressVerdict,
     keywordId: null,
-    reveal: "Eerst een besluit, dan pas vrijgave. De persconferentie is hiermee afgerond.",
+    feedbackOk: "Juist. Concrete opties uit het dossier blijven intern tot vrijgave.",
+    feedbackBad: "Fout. Concrete locatieopties uit het dossier zijn nog niet voor publicatie.",
   },
 ] as const;
+
+export const PRESS_GAPS = [
+  { id: "gap-1", correctId: "akkoord", hint: "proces met partners" },
+  { id: "gap-2", correctId: "stabiliteit", hint: "lijn van de club" },
+  { id: "gap-3", correctId: "locatie", hint: "toekomst van het stadion" },
+] as const;
+
+export function pressGapsRestored(placed: Record<string, string | null>) {
+  return PRESS_GAPS.every((gap) => placed[gap.id] === gap.correctId);
+}
 
 export const PROTOCOL_CHOICES = [
   {

@@ -45,7 +45,7 @@ export const PHASE1_JUMPS: JumpTarget[] = [
   { id: "d2-5", label: "Dossier 02 · 5", detail: "Toegangsarchief", screen: "dossier2", taskIndex: 2, dossierTask: 5, step: 3, phase: "playing" },
   { id: "d2-6", label: "Dossier 02 · 6", detail: "Ontbrekende document", screen: "dossier2", taskIndex: 2, dossierTask: 6, step: 4, phase: "playing" },
   { id: "d2-end", label: "Dossier 02 · eind", detail: "Dossier gesloten", screen: "dossier2end", taskIndex: 2, dossierTask: 6, step: 5, phase: "done" },
-  { id: "d3-7", label: "Dossier 03 · 7", detail: "Persconferentie", screen: "dossier3", taskIndex: 2, dossierTask: 6, step: 5, phase: "done", embargoTask: 7 },
+  { id: "d3-7", label: "Dossier 03 · 7", detail: "Publicatiecheck · perszaal", screen: "dossier3", taskIndex: 2, dossierTask: 6, step: 5, phase: "done", embargoTask: 7 },
   { id: "d3-8", label: "Dossier 03 · 8", detail: "Communicatieprotocol", screen: "dossier3", taskIndex: 2, dossierTask: 6, step: 5, phase: "done", embargoTask: 8 },
   { id: "d3-9", label: "Dossier 03 · 9", detail: "Memory · wat werd gelekt?", screen: "dossier3", taskIndex: 2, dossierTask: 6, step: 5, phase: "done", embargoTask: 9 },
 ];
