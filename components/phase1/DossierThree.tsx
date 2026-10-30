@@ -103,41 +103,56 @@ function PressTask({ onBack, onNext }: { onBack: () => void; onNext: () => void 
     <section className="mg-screen d3-screen">
       <Bar kicker="Dossier 03 · Opdracht 7" title="Persconferentie" step={0} onBack={onBack} />
       <p className="mg-note">
-        Dit is een conceptpersverklaring: wat ADO Den Haag officieel mocht zeggen. De zwarte stukken zijn bewust weggelaten — die bleven intern. Bekijk daarna de sleutelwoorden van de persconferentie en beantwoord de publicatiecheck.
+        Bekijk de conceptpersverklaring. De zwartgelakte stukken bleven intern. Open daarna de sleutelwoorden van de persconferentie en beantwoord de publicatiecheck.
       </p>
 
-      <article className="d3-press-doc">
-        <header>
-          <span>ADO Den Haag · Communicatie</span>
-          <strong className="d3-stamp-red">Concept</strong>
-        </header>
+      <article className="d3-doc d3-doc-letter">
+        <div className="d3-doc-letterhead">
+          <img src="/ado/logo.svg" alt="" />
+          <div>
+            <strong>ADO Den Haag</strong>
+            <span>Afdeling Communicatie</span>
+            <em>Cars Jeukenslaan 2 · Den Haag</em>
+          </div>
+          <b className="d3-stamp-ink">Concept</b>
+        </div>
+        <p className="d3-doc-ref">COM-2023-10 · bestemd voor officiële vrijgave na bestuursbesluit</p>
         <h2>Conceptpersverklaring</h2>
-        <p className="d3-meta">Bestemd voor: officiële vrijgave na bestuursbesluit</p>
-        <p>
+        <p className="d3-doc-body">
           ADO Den Haag werkt aan de toekomst van de club. Het bestuur bereidt plannen voor rondom de ontwikkeling van het stadion en de clubfaciliteiten.
         </p>
-        <p>
+        <p className="d3-doc-body">
           In deze fase worden alleen algemene toekomstplannen gedeeld. Financiële ramingen en technische details van het stadiondossier blijven intern totdat een definitief besluit is genomen.
         </p>
-        <div className="d3-redacted" aria-label="Zwartgelakte interne passages">
-          <span className="d3-redacted-label">Zwartgelakt · intern</span>
+        <div className="d3-redact-block" aria-label="Zwartgelakte interne passages">
+          <span>Zwartgelakt · niet voor publicatie</span>
           <i />
           <i />
           <i />
         </div>
-        <button className="mg-ghost" type="button" onClick={() => setOpened((value) => !value)}>
-          {opened ? "Verberg sleutelwoorden" : "Toon sleutelwoorden van de persconferentie"}
-        </button>
+        <footer className="d3-doc-foot">
+          <span>Pagina 1 van 1</span>
+          <span>Alleen voor intern gebruik tot vrijgave</span>
+        </footer>
       </article>
 
+      <button className="d3-reveal" type="button" onClick={() => setOpened((value) => !value)}>
+        {opened ? "Verberg sleutelwoorden" : "Toon sleutelwoorden van de persconferentie"}
+      </button>
+
       {opened ? (
-        <div className="d3-keys" role="list">
-          <p className="mg-kicker">Vastgelegd tijdens de persconferentie</p>
-          {PRESS_KEYWORDS.map((item) => (
-            <span key={item.id} role="listitem">
-              {item.label}
-            </span>
-          ))}
+        <div className="d3-notes" role="list">
+          <header>
+            <p className="mg-kicker">Persconferentie · vastgelegd</p>
+            <span>Notitieblok communicatie</span>
+          </header>
+          <div className="d3-note-chips">
+            {PRESS_KEYWORDS.map((item) => (
+              <span key={item.id} role="listitem">
+                {item.label}
+              </span>
+            ))}
+          </div>
         </div>
       ) : null}
 
@@ -208,48 +223,51 @@ function ProtocolTask({ onBack, onNext }: { onBack: () => void; onNext: () => vo
       </p>
 
       <div className="d3-split">
-        <article className="d3-memo">
-          <header>
+        <article className="d3-doc d3-doc-memo">
+          <div className="d3-memo-top">
             <span>ADO Den Haag · Bestuurssecretariaat</span>
-            <strong className="d3-stamp-red">Vertrouwelijk</strong>
-          </header>
-          <h3>Interne memo — Communicatieprotocol</h3>
-          <p className="d3-meta">10 oktober 2023 · Voorbereiding bestuursvergadering</p>
-          <ol>
+            <b className="d3-stamp-ink">Vertrouwelijk</b>
+          </div>
+          <h3>Interne memo</h3>
+          <p className="d3-doc-ref">Communicatieprotocol · 10 oktober 2023</p>
+          <ol className="d3-memo-list">
             <li>
-              <strong>Aanleiding</strong>
-              <span>Stadionplannen staan op de agenda.</span>
+              <strong>01 · Aanleiding</strong>
+              <span>Stadionplannen staan op de agenda van de bestuursvergadering.</span>
             </li>
             <li>
-              <strong>Besluitvorming</strong>
-              <span className="d3-blackout">████████████████████</span>
+              <strong>02 · Besluitvorming</strong>
+              <span className="d3-line-blackout" aria-hidden="true" />
             </li>
             <li>
-              <strong>Communicatie</strong>
-              <span className="d3-blackout">████████████████████</span>
+              <strong>03 · Communicatie</strong>
+              <span className="d3-line-blackout" aria-hidden="true" />
             </li>
             <li>
-              <strong>Vertrouwelijkheid</strong>
+              <strong>04 · Vertrouwelijkheid</strong>
               <span>Alleen voor bestuursleden. Niet kopiëren of delen vóór een definitief besluit.</span>
             </li>
           </ol>
-          <button className="mg-ghost" type="button" onClick={() => setZoom("memo")}>
-            Vergroot
+          <button className="d3-doc-link" type="button" onClick={() => setZoom("memo")}>
+            Lees memo volledig
           </button>
         </article>
 
-        <article className="d3-paper">
-          <header>
-            <span>Haags Dagblad</span>
-            <strong className="d3-stamp-red is-warn">Mogelijke embargoschending</strong>
+        <article className="d3-doc d3-doc-news">
+          <header className="d3-news-mast">
+            <strong>Haags Dagblad</strong>
+            <span>Ochtendeditie · vóór officiële vrijgave</span>
           </header>
+          <b className="d3-stamp-ink is-warn">Embargo?</b>
           <h3>ADO Den Haag zet grote stap richting nieuw stadion</h3>
-          <p className="d3-meta">Ochtendeditie · vóór officiële vrijgave</p>
-          <p>
-            Bronnen melden concrete locatieopties en technische keuzes die nog niet officieel zijn gedeeld. Het bericht bevat details die niet in de goedgekeurde persverklaring stonden.
+          <p className="d3-news-lead">
+            Bronnen melden concrete locatieopties en technische keuzes die nog niet officieel zijn gedeeld.
           </p>
-          <button className="mg-ghost" type="button" onClick={() => setZoom("paper")}>
-            Vergroot
+          <p className="d3-doc-body">
+            Het bericht bevat details die niet in de goedgekeurde persverklaring stonden. Clubwoordvoerders wilden nog niet reageren.
+          </p>
+          <button className="d3-doc-link" type="button" onClick={() => setZoom("paper")}>
+            Lees artikel volledig
           </button>
         </article>
       </div>
@@ -294,16 +312,27 @@ function ProtocolTask({ onBack, onNext }: { onBack: () => void; onNext: () => vo
 
       {zoom ? (
         <div className="d3-zoom" role="dialog" aria-modal="true">
-          <div className="d3-zoom-card">
+          <div className={`d3-zoom-sheet${zoom === "paper" ? " is-news" : ""}`}>
             {zoom === "memo" ? (
               <>
-                <p className="mg-kicker">Interne memo</p>
-                <p>Vertrouwelijke informatie mag niet extern worden gedeeld voordat een definitief besluit is genomen. Externe vragen lopen via de woordvoerder.</p>
+                <p className="mg-kicker">Interne memo · volledig</p>
+                <h3>Communicatieprotocol</h3>
+                <p>
+                  Vertrouwelijke informatie mag niet extern worden gedeeld voordat een definitief besluit is genomen. Externe vragen lopen via de woordvoerder.
+                </p>
+                <p>
+                  Tot die tijd blijft het stadiondossier uitsluitend beschikbaar voor bestuursleden en de aangewezen communicatiecoördinator.
+                </p>
               </>
             ) : (
               <>
-                <p className="mg-kicker">Haags Dagblad</p>
-                <p>Het artikel verscheen vóór de officiële vrijgave en bevat details uit het vertrouwelijke dossier.</p>
+                <p className="d3-news-mast">
+                  <strong>Haags Dagblad</strong>
+                </p>
+                <h3>ADO Den Haag zet grote stap richting nieuw stadion</h3>
+                <p>
+                  Het artikel verscheen vóór de officiële vrijgave en bevat details uit het vertrouwelijke dossier: locatieopties, technische keuzes en passages die in de conceptpersverklaring nog zwartgelakt stonden.
+                </p>
               </>
             )}
             <button className="mg-yellow mg-cta" type="button" onClick={() => setZoom(null)}>
@@ -340,15 +369,28 @@ function LeakTask({ onBack, onFinished }: { onBack: () => void; onFinished: () =
         De volgende ochtend stond er een nieuwsartikel met specifieke informatie over de stadionontwikkeling. Die details stonden niet in de goedgekeurde persverklaring.
       </p>
 
-      <article className="d3-paper">
-        <header>
-          <span>Haags Dagblad · Analyse</span>
-          <strong className="d3-stamp-red is-warn">Lek?</strong>
+      <article className="d3-doc d3-doc-news is-feature">
+        <header className="d3-news-mast">
+          <strong>Haags Dagblad</strong>
+          <span>Analyse · ochtendeditie</span>
         </header>
+        <b className="d3-stamp-ink is-warn">Lek?</b>
         <h3>Details wijken af van de officiële verklaring</h3>
-        <p>
-          Het bericht bevat technische en financiële informatie die alleen in het vertrouwelijke stadiondossier voorkomt — niet in de conceptpersverklaring.
+        <p className="d3-news-lead">
+          Technische en financiële informatie uit het vertrouwelijke stadiondossier bereikte de media vóór een bestuursbesluit.
         </p>
+        <div className="d3-news-cols">
+          <p>
+            In de goedgekeurde conceptpersverklaring stonden alleen algemene toekomstplannen. De zwarte passages — ramingen, technische specificaties — bleven intern.
+          </p>
+          <p>
+            Toch noemt dit artikel precies die onderdelen. De vraag is niet óf er iets is gelekt, maar wáár die informatie vandaan kwam.
+          </p>
+        </div>
+        <footer className="d3-doc-foot">
+          <span>Bronnen rondom de Senaatskamer</span>
+          <span>Vervolg op pagina 4</span>
+        </footer>
       </article>
 
       <div className="d3-ask">
