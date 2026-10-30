@@ -204,12 +204,12 @@ export const LEAK_CORRECT = "dossier";
 export const MEMORY_SECONDS = 60;
 
 export const MEMORY_PAIRS = [
-  { pairId: "mic", label: "Microfoon", image: "/ado/memory/mic.png" },
-  { pairId: "folders", label: "Vertrouwelijk dossier", image: "/ado/memory/folders.png" },
-  { pairId: "newspaper", label: "Haags Dagblad", image: "/ado/memory/newspaper.png" },
-  { pairId: "map", label: "Locatie", image: "/ado/memory/map.png" },
-  { pairId: "laptop", label: "Werkstation", image: "/ado/memory/laptop.png" },
-  { pairId: "camera", label: "Bewakingscamera", image: "/ado/memory/camera.png" },
+  { pairId: "mic", label: "Microfoon", image: "/ado/memory/mic.jpg" },
+  { pairId: "folders", label: "Vertrouwelijk dossier", image: "/ado/memory/folders.jpg" },
+  { pairId: "newspaper", label: "Haags Dagblad", image: "/ado/memory/newspaper.jpg" },
+  { pairId: "map", label: "Locatie", image: "/ado/memory/map.jpg" },
+  { pairId: "laptop", label: "Werkstation", image: "/ado/memory/laptop.jpg" },
+  { pairId: "camera", label: "Bewakingscamera", image: "/ado/memory/camera.jpg" },
 ] as const;
 
 export type MemoryCard = {
