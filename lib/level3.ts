@@ -56,73 +56,49 @@ export type PressJournalist = {
   y: number;
   w: number;
   h: number;
-  /** Waar de tekstballon boven de hotspot hangt. */
   bubbleSide: "left" | "right" | "center";
+  /** Pose als deze journalist aan het woord is. */
+  speakSrc: string;
 };
 
-/** Zes journalisten in de ADO-perszaal (klikbare hotspots). */
+/** Drie frontjournalisten — speler kiest zelf de volgorde. */
 export const PRESS_JOURNALISTS: PressJournalist[] = [
+  {
+    id: "mark",
+    outlet: "Omroep West",
+    name: "Mark de Boer",
+    x: 10,
+    y: 38,
+    w: 18,
+    h: 34,
+    bubbleSide: "right",
+    speakSrc: "/ado/pers-speak-left.jpg",
+  },
   {
     id: "lisa",
     outlet: "Haags Dagblad",
     name: "Lisa Vermeer",
     x: 30,
-    y: 34,
+    y: 32,
     w: 18,
-    h: 36,
+    h: 38,
     bubbleSide: "center",
-  },
-  {
-    id: "mark",
-    outlet: "Omroep West",
-    name: "Mark de Boer",
-    x: 12,
-    y: 42,
-    w: 16,
-    h: 30,
-    bubbleSide: "right",
+    speakSrc: "/ado/pers-speak-center.jpg",
   },
   {
     id: "sander",
     outlet: "AD Sportwereld",
     name: "Sander Kuiper",
-    x: 52,
-    y: 40,
-    w: 16,
-    h: 30,
+    x: 50,
+    y: 36,
+    w: 18,
+    h: 36,
     bubbleSide: "left",
-  },
-  {
-    id: "noor",
-    outlet: "Den Haag FM",
-    name: "Noor Hassani",
-    x: 22,
-    y: 26,
-    w: 14,
-    h: 24,
-    bubbleSide: "right",
-  },
-  {
-    id: "tim",
-    outlet: "Voetbal International",
-    name: "Tim Janssen",
-    x: 68,
-    y: 28,
-    w: 14,
-    h: 26,
-    bubbleSide: "left",
-  },
-  {
-    id: "eva",
-    outlet: "NOS",
-    name: "Eva Bergkamp",
-    x: 46,
-    y: 22,
-    w: 13,
-    h: 22,
-    bubbleSide: "center",
+    speakSrc: "/ado/pers-speak-right.jpg",
   },
 ];
+
+export const PRESS_IDLE_SRC = "/ado/pers-hands3.jpg";
 
 /**
  * Publicatiecheck: beoordeel of het antwoord/onderwerp openbaar mag.
@@ -158,7 +134,7 @@ export const PRESS_QUESTIONS = [
   },
   {
     id: "q4",
-    journalistId: "noor",
+    journalistId: "lisa",
     prompt: "Jullie zoeken overeenstemming met partners over het proces. Mag het woord ‘akkoord’ in die zin openbaar?",
     correct: "publicatie" as PressVerdict,
     keywordId: "akkoord" as const,
@@ -167,7 +143,7 @@ export const PRESS_QUESTIONS = [
   },
   {
     id: "q5",
-    journalistId: "tim",
+    journalistId: "mark",
     prompt: "Mag ADO benadrukken dat de club inzet op stabiliteit richting supporters en stad?",
     correct: "publicatie" as PressVerdict,
     keywordId: "stabiliteit" as const,
@@ -176,7 +152,7 @@ export const PRESS_QUESTIONS = [
   },
   {
     id: "q6",
-    journalistId: "eva",
+    journalistId: "sander",
     prompt: "Kunnen jullie al concrete interne locatieopties en scenario’s uit het dossier delen?",
     correct: "intern" as PressVerdict,
     keywordId: null,

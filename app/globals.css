@@ -3942,26 +3942,24 @@ p.story,
 
 .d3-mem-card {
   position: relative;
-  min-height: 92px;
+  aspect-ratio: 1;
+  min-height: 0;
   padding: 0;
   border: 0;
   border-radius: 14px;
-  perspective: 800px;
-  background: transparent;
+  overflow: hidden;
+  background: #07140e;
+  isolation: isolate;
 }
 
 .d3-mem-back,
-.d3-mem-front {
+.d3-mem-face {
   position: absolute;
   inset: 0;
   display: grid;
   place-items: center;
-  padding: 12px;
   border-radius: 14px;
-  backface-visibility: hidden;
-  transition: transform 0.35s ease;
-  text-align: center;
-  line-height: 1.25;
+  overflow: hidden;
 }
 
 .d3-mem-back {
@@ -3973,35 +3971,24 @@ p.story,
   border: 1px solid rgba(255, 224, 0, 0.35);
 }
 
-.d3-mem-front {
-  background: #0a120e;
-  color: #1a2418;
-  font-size: 15px;
-  font-weight: 700;
-  transform: rotateY(180deg);
+.d3-mem-face {
+  background: #050a08;
   border: 1px solid rgba(255, 224, 0, 0.28);
-  padding: 8px;
+  padding: 6px;
 }
 
-.d3-mem-front img {
+.d3-mem-face img {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  object-position: center;
   display: block;
   pointer-events: none;
 }
 
-.d3-mem-card.is-open .d3-mem-back {
-  transform: rotateY(180deg);
-}
-
-.d3-mem-card.is-open .d3-mem-front {
-  transform: rotateY(0deg);
-}
-
-.d3-mem-card.is-matched .d3-mem-front {
-  background: #ffe000;
-  box-shadow: 0 0 0 2px #003b1f;
+.d3-mem-card.is-matched .d3-mem-face {
+  background: #1a2418;
+  box-shadow: inset 0 0 0 3px #ffe000;
 }
 
 .d3-mem-card:disabled {
@@ -4011,14 +3998,6 @@ p.story,
 @media (min-width: 768px) {
   .d3-memory {
     grid-template-columns: repeat(4, 1fr);
-  }
-
-  .d3-mem-card {
-    min-height: 110px;
-  }
-
-  .d3-mem-front {
-    font-size: 17px;
   }
 }
 

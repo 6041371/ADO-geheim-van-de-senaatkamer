@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import {
   PRESS_GAPS,
+  PRESS_IDLE_SRC,
   PRESS_JOURNALISTS,
   PRESS_KEYWORDS,
   PRESS_QUESTIONS,
@@ -38,19 +39,22 @@ export function PressConference({ onBack, onNext }: { onBack: () => void; onNext
     ? PRESS_JOURNALISTS.find((j) => j.id === activeQuestion.journalistId)
     : null;
 
-  /** Volgende journalist die nog moet: hand omhoog. */
-  const nextUpId = remaining[0]?.journalistId ?? null;
+  const waitingIds = useMemo(() => {
+    const ids = new Set(remaining.map((q) => q.journalistId));
+    return PRESS_JOURNALISTS.filter((j) => ids.has(j.id)).map((j) => j.id);
+  }, [remaining]);
 
   function callOn(journalistId: string) {
     if (phase !== "live" || speaking || feedback) return;
     const question = remaining.find((q) => q.journalistId === journalistId);
     if (!question) return;
-    if (journalistId !== nextUpId) return;
     setActiveId(question.id);
     setSpeaking(true);
     setVerdict(null);
     setFeedback(null);
   }
+
+  const sceneSrc = speaking && activeJournalist ? activeJournalist.speakSrc : PRESS_IDLE_SRC;
 
   function answer(choice: PressVerdict) {
     if (!activeQuestion || feedback) return;
@@ -133,12 +137,11 @@ export function PressConference({ onBack, onNext }: { onBack: () => void; onNext
       {phase === "briefing" ? (
         <>
           <div className="press-scene is-preview">
-            <img src="/ado/pers-idle.jpg" alt="Perszaal ADO Den Haag vanuit de woordvoerdersstoel" />
+            <img src={PRESS_IDLE_SRC} alt="Perszaal ADO Den Haag vanuit de woordvoerdersstoel" />
           </div>
           <p className="mg-note">
-            Je zit achter de microfoons in de ADO-perszaal. Journalisten steken hun hand op. Tik op wie mag
-            spreken, beoordeel of het onderwerp geschikt is voor publicatie of alleen intern — en herstel daarna de
-            conceptpersverklaring met AKKOORD, STABILITEIT en LOCATIE.
+            Je zit achter de microfoons. Drie journalisten steken hun hand op — kies zelf wie eerst mag. Beoordeel
+            publicatie of intern, en herstel daarna de conceptpersverklaring met AKKOORD, STABILITEIT en LOCATIE.
           </p>
           <button className="mg-yellow mg-cta" type="button" onClick={() => setPhase("live")}>
             Neem plaats achter de tafel
@@ -163,37 +166,37 @@ export function PressConference({ onBack, onNext }: { onBack: () => void; onNext
 
           <div className={`press-scene${speaking ? " is-speaking" : " is-idle"}`}>
             <img
-              key={speaking ? "speaking" : "idle"}
+              key={sceneSrc}
               className="press-scene-photo"
-              src={speaking ? "/ado/pers-speaking.jpg" : "/ado/pers-idle.jpg"}
+              src={sceneSrc}
               alt={
                 speaking
                   ? "Journalist stelt een vraag; anderen schrijven mee"
-                  : "Journalist steekt de hand op in de ADO-perszaal"
+                  : "Drie journalisten steken de hand op in de ADO-perszaal"
               }
             />
 
             {PRESS_JOURNALISTS.map((journalist) => {
-              const question = PRESS_QUESTIONS.find((q) => q.journalistId === journalist.id);
-              const done = question ? answered.includes(question.id) : false;
-              const isNext = journalist.id === nextUpId && phase === "live" && !speaking && !feedback;
+              const pending = remaining.some((q) => q.journalistId === journalist.id);
+              const done = !pending;
+              const isWaiting = pending && phase === "live" && !speaking && !feedback;
               const isActive = speaking && activeJournalist?.id === journalist.id;
               return (
                 <button
                   key={journalist.id}
                   type="button"
-                  className={`press-hotspot${isNext ? " is-waiting" : ""}${isActive ? " is-active" : ""}${done ? " is-done" : ""}`}
+                  className={`press-hotspot${isWaiting ? " is-waiting" : ""}${isActive ? " is-active" : ""}${done ? " is-done" : ""}`}
                   style={{
                     left: `${journalist.x}%`,
                     top: `${journalist.y}%`,
                     width: `${journalist.w}%`,
                     height: `${journalist.h}%`,
                   }}
-                  aria-label={`${journalist.name}, ${journalist.outlet}${isNext ? " — steekt hand op" : ""}`}
-                  disabled={phase !== "live" || done || Boolean(feedback) || (speaking && !isActive) || (!isNext && !isActive)}
+                  aria-label={`${journalist.name}, ${journalist.outlet}${isWaiting ? " — steekt hand op" : ""}`}
+                  disabled={phase !== "live" || done || Boolean(feedback) || (speaking && !isActive)}
                   onClick={() => callOn(journalist.id)}
                 >
-                  {isNext || isActive ? (
+                  {isWaiting || isActive ? (
                     <span className="press-hand" aria-hidden="true">
                       ✋
                     </span>
@@ -223,7 +226,7 @@ export function PressConference({ onBack, onNext }: { onBack: () => void; onNext
             <p className="mg-note press-hint">
               {remaining.length === 0
                 ? "Alle vragen zijn beantwoord."
-                : "Een journalist steekt de hand op. Tik op die persoon om het woord te geven."}
+                : `${waitingIds.length} journalist${waitingIds.length === 1 ? "" : "en"} met hand omhoog — kies wie je het woord geeft.`}
             </p>
           ) : null}
 

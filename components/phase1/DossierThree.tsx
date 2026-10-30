@@ -335,10 +335,13 @@ function LeakTask({ onBack, onFinished }: { onBack: () => void; onFinished: () =
               onClick={() => flip(card)}
               disabled={!running || timedOut || won || lock}
             >
-              <span className="d3-mem-back">ADO</span>
-              <span className="d3-mem-front">
-                <img src={card.image} alt={card.label} />
-              </span>
+              {open ? (
+                <span className="d3-mem-face">
+                  <img src={card.image} alt={card.label} />
+                </span>
+              ) : (
+                <span className="d3-mem-back">ADO</span>
+              )}
             </button>
           );
         })}
