@@ -37,13 +37,17 @@ test("houdt de start tegen zolang namen ontbreken", () => {
 });
 
 test("staat alleen eigen vooruitgang toe", () => {
+  const milestones = [2, 3, 5, 6, 7, 8];
   assert.equal(progressAllowed({ stepIndex: 0, phase: "intro" }, { stepIndex: 0, phase: "playing" }, 3), true);
   assert.equal(progressAllowed({ stepIndex: 0, phase: "playing" }, { stepIndex: 2, phase: "playing" }, 3), false);
   assert.equal(progressAllowed({ stepIndex: 1, phase: "playing" }, { stepIndex: 0, phase: "playing" }, 3), false);
-  assert.equal(progressAllowed({ stepIndex: 3, phase: "playing" }, { stepIndex: 3, phase: "done" }, 3), true);
-  assert.equal(progressAllowed({ stepIndex: 1, phase: "playing" }, { stepIndex: 1, phase: "done" }, 3), false);
-  assert.equal(progressAllowed({ stepIndex: 2, phase: "playing" }, { stepIndex: 2, phase: "done" }, 5), true);
-  assert.equal(progressAllowed({ stepIndex: 2, phase: "done" }, { stepIndex: 3, phase: "playing" }, 5), true);
-  assert.equal(progressAllowed({ stepIndex: 4, phase: "playing" }, { stepIndex: 5, phase: "done" }, 5), true);
-  assert.equal(progressAllowed({ stepIndex: 5, phase: "done" }, { stepIndex: 5, phase: "playing" }, 5), false);
+  assert.equal(progressAllowed({ stepIndex: 3, phase: "playing" }, { stepIndex: 3, phase: "done" }, 3, milestones), true);
+  assert.equal(progressAllowed({ stepIndex: 1, phase: "playing" }, { stepIndex: 1, phase: "done" }, 3, milestones), false);
+  assert.equal(progressAllowed({ stepIndex: 2, phase: "playing" }, { stepIndex: 2, phase: "done" }, 5, milestones), true);
+  assert.equal(progressAllowed({ stepIndex: 2, phase: "done" }, { stepIndex: 3, phase: "playing" }, 5, milestones), true);
+  assert.equal(progressAllowed({ stepIndex: 4, phase: "playing" }, { stepIndex: 5, phase: "done" }, 5, milestones), true);
+  assert.equal(progressAllowed({ stepIndex: 5, phase: "done" }, { stepIndex: 5, phase: "playing" }, 5, milestones), false);
+  assert.equal(progressAllowed({ stepIndex: 5, phase: "done" }, { stepIndex: 6, phase: "done" }, 8, milestones), true);
+  assert.equal(progressAllowed({ stepIndex: 6, phase: "done" }, { stepIndex: 7, phase: "done" }, 8, milestones), true);
+  assert.equal(progressAllowed({ stepIndex: 7, phase: "done" }, { stepIndex: 8, phase: "done" }, 8, milestones), true);
 });

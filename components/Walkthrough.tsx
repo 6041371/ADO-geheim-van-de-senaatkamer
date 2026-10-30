@@ -22,10 +22,12 @@ export function Walkthrough({
   startedAt,
   stepIndex,
   onStepIndex,
+  onLevelComplete,
 }: {
   startedAt: number;
   stepIndex: number;
   onStepIndex: (index: number) => void;
+  onLevelComplete?: (level: number) => void | Promise<void>;
 }) {
   const [overtime, setOvertime] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
@@ -44,8 +46,21 @@ export function Walkthrough({
   }, [stepIndex]);
 
   function goNext() {
-    onStepIndex(Math.min(stepIndex + 1, STEPS.length - 1));
+    const current = STEPS[Math.min(stepIndex, STEPS.length - 1)];
+    const nextIndex = Math.min(stepIndex + 1, STEPS.length - 1);
+    const next = STEPS[nextIndex];
+    if (current && next && (current.level < next.level || current.kind === "finale")) {
+      void onLevelComplete?.(current.level);
+    }
+    onStepIndex(nextIndex);
   }
+
+  useEffect(() => {
+    if (step.kind !== "finale") return;
+    void onLevelComplete?.(step.level);
+    // Markeer dossier 5 klaar zodra de finalescreen zichtbaar is.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step.kind, step.level]);
 
   return (
     <main className="app">

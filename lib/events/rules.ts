@@ -45,13 +45,19 @@ export function progressAllowed(
   current: { stepIndex: number; phase: Phase },
   next: { stepIndex: number; phase: Phase },
   lastStep: number,
+  doneMilestones: readonly number[] = [2, lastStep],
 ) {
   if (next.stepIndex < 0 || next.stepIndex > lastStep) return false;
-  if (current.phase === "done" && current.stepIndex === 2 && next.phase === "playing" && next.stepIndex === 3) return true;
+  // Van een afgerond dossier naar de volgende mijlpaal (bijv. d2 klaar → d3 klaar).
+  if (current.phase === "done" && next.stepIndex === current.stepIndex + 1) {
+    return next.phase === "playing" || next.phase === "done";
+  }
   if (next.stepIndex < current.stepIndex || next.stepIndex > current.stepIndex + 1) return false;
   if (current.phase === "done") return next.phase === "done" && next.stepIndex === current.stepIndex;
   if (current.phase === "playing" && next.phase === "intro") return false;
   if (next.phase === "intro") return current.phase === "intro" && next.stepIndex === 0;
-  if (next.phase === "done") return next.stepIndex === lastStep || (next.stepIndex === 2 && current.stepIndex === 2);
+  if (next.phase === "done") {
+    return doneMilestones.includes(next.stepIndex) && (next.stepIndex === current.stepIndex || next.stepIndex === current.stepIndex + 1);
+  }
   return true;
 }

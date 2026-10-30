@@ -1,12 +1,12 @@
 import { randomUUID } from "node:crypto";
-import { DOSSIER2_LAST_STEP } from "../level2";
+import { DONE_MILESTONES, GAME_LAST_STEP } from "../level3";
 import { MemoryStore } from "./memory-store";
 import { createCode, joinDecision, normalizeCode, normalizeTeamName, progressAllowed, startBlockers } from "./rules";
 import type { EventStore } from "./store";
 import { createHostToken, hashMatches, hashToken, participantToken, randomCodeByte } from "./tokens";
 import { FlowError, type EventRecord, type HostRow, type ParticipantRecord, type Phase, type TeamRow } from "./types";
 
-const LAST_STEP = DOSSIER2_LAST_STEP;
+const LAST_STEP = GAME_LAST_STEP;
 const EVENT_HOURS = 12;
 
 export class EventService {
@@ -158,7 +158,7 @@ export class EventService {
     if (loaded.event.status !== "started") {
       throw new FlowError("invalid_status", "De opdrachten starten pas als de instructeur het evenement start.", 409);
     }
-    if (!progressAllowed(loaded.participant, { stepIndex, phase }, LAST_STEP)) {
+    if (!progressAllowed(loaded.participant, { stepIndex, phase }, LAST_STEP, DONE_MILESTONES)) {
       throw new FlowError("invalid_status", "Die voortgang hoort niet bij dit team.", 409);
     }
     const updated = await this.store.setProgress(loaded.participant.id, {

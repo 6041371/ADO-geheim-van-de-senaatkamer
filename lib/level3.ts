@@ -1,4 +1,25 @@
 import type { HintSet } from "./level1";
+import type { Phase } from "./events/types";
+
+/** Server steps: 0–2 d1, 3–5 d2, 6 d3 done, 7 d4 done, 8 d5 done */
+export const DOSSIER3_STEP = 6;
+export const DOSSIER4_STEP = 7;
+export const DOSSIER5_STEP = 8;
+export const GAME_LAST_STEP = DOSSIER5_STEP;
+
+export const DONE_MILESTONES = [2, 5, DOSSIER3_STEP, DOSSIER4_STEP, DOSSIER5_STEP] as const;
+
+export function dossier3Complete(_phase: Phase, step: number) {
+  return step >= DOSSIER3_STEP;
+}
+
+export function dossier4Complete(_phase: Phase, step: number) {
+  return step >= DOSSIER4_STEP;
+}
+
+export function dossier5Complete(_phase: Phase, step: number) {
+  return step >= DOSSIER5_STEP;
+}
 
 export const DOSSIER3_HINTS: Record<7 | 8 | 9, HintSet> = {
   7: {

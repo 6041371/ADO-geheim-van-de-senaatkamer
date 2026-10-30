@@ -28,6 +28,14 @@ export function firstWalkStepForLevel(level: number) {
   return index < 0 ? 0 : index;
 }
 
+export function lastWalkStepForLevel(level: number) {
+  let last = -1;
+  STEPS.forEach((step, index) => {
+    if (step.level === level) last = index;
+  });
+  return last < 0 ? 0 : last;
+}
+
 export const PHASE1_JUMPS: JumpTarget[] = [
   { id: "d1-1", label: "Dossier 01 · 1", detail: "Wie was aanwezig?", screen: "task", taskIndex: 0, dossierTask: 4, step: 0, phase: "playing" },
   { id: "d1-2", label: "Dossier 01 · 2", detail: "Ontbrekende notulen", screen: "task", taskIndex: 1, dossierTask: 4, step: 1, phase: "playing" },

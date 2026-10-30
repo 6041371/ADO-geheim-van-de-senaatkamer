@@ -14,9 +14,11 @@ type Task = 7 | 8 | 9;
 
 export function DossierThree({
   onMenu,
+  onComplete,
   startTask = 7,
 }: {
   onMenu: () => void;
+  onComplete: () => Promise<boolean>;
   startTask?: Task;
 }) {
   const [task, setTask] = useState<Task>(startTask);
@@ -27,7 +29,14 @@ export function DossierThree({
   if (task === 8) {
     return <ProtocolTask onBack={onMenu} onNext={() => setTask(9)} />;
   }
-  return <LeakTask onBack={onMenu} onFinished={onMenu} />;
+  return (
+    <LeakTask
+      onBack={onMenu}
+      onFinished={() => {
+        void onComplete();
+      }}
+    />
+  );
 }
 
 function Bar({

@@ -3,8 +3,16 @@
 import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { DOSSIERS, EVIDENCE, HINTS, LOCKED_MESSAGE, completedTasks, type HintSet } from "@/lib/level1";
 import { DOSSIER2_EVIDENCE, DOSSIER2_HINTS, dossier1Complete, dossier2Complete, dossier2DoneCount } from "@/lib/level2";
+import {
+  DOSSIER3_STEP,
+  DOSSIER4_STEP,
+  DOSSIER5_STEP,
+  dossier3Complete,
+  dossier4Complete,
+  dossier5Complete,
+} from "@/lib/level3";
 import type { Phase } from "@/lib/events/types";
-import { type GameScreen } from "@/lib/walkthrough-jumps";
+import { firstWalkStepForLevel, lastWalkStepForLevel, type GameScreen } from "@/lib/walkthrough-jumps";
 import { Logo } from "@/components/Logo";
 import { Walkthrough } from "@/components/Walkthrough";
 import { DossierThree } from "./DossierThree";
@@ -46,6 +54,9 @@ export function PhaseOne({
   const completed = completedTasks(phase, stepIndex);
   const dossier1Done = dossier1Complete(phase, stepIndex);
   const dossier2Done = dossier2Complete(phase, stepIndex);
+  const dossier3Done = dossier3Complete(phase, stepIndex);
+  const dossier4Done = dossier4Complete(phase, stepIndex);
+  const dossier5Done = dossier5Complete(phase, stepIndex);
   const fallback = defaultView(phase, stepIndex, completed);
   const [ready, setReady] = useState(false);
   const [introSeen, setIntroSeen] = useState(phase !== "intro");
@@ -82,6 +93,12 @@ export function PhaseOne({
     if (!ready) return;
     saveView(teamId, { screen, taskIndex, dossierTask, forcedDossierTask, walkStep, embargoTask });
   }, [ready, teamId, screen, taskIndex, dossierTask, forcedDossierTask, walkStep, embargoTask]);
+
+  useEffect(() => {
+    if (!ready || !dossier2Done || dossier3Done) return;
+    if (window.localStorage.getItem(`ado-d3-done:${teamId}`) !== "1") return;
+    void onProgress(DOSSIER3_STEP, "done");
+  }, [ready, teamId, dossier2Done, dossier3Done, onProgress]);
 
   const hintKey = screen === "dossier2" || screen === "dossier2end" ? `d2-${dossierTask}` : String(taskIndex);
 
@@ -125,7 +142,21 @@ export function PhaseOne({
       setScreen("dossier3");
       return;
     }
-    if (id >= 4) {
+    if (id === 4 || id === 5) {
+      const unlocked = id === 4 ? dossier3Done : dossier4Done;
+      if (!unlocked) {
+        setBanner(LOCKED_MESSAGE);
+        return;
+      }
+      setBanner(null);
+      setForcedDossierTask(null);
+      const first = firstWalkStepForLevel(id);
+      const last = lastWalkStepForLevel(id);
+      setWalkStep((current) => (current >= first && current <= last ? current : first));
+      setScreen("walkthrough");
+      return;
+    }
+    if (id > 5) {
       setBanner(LOCKED_MESSAGE);
       return;
     }
@@ -199,7 +230,13 @@ export function PhaseOne({
             </button>
             <div className="mg-dossiers">
               {DOSSIERS.filter((dossier) => dossier.id > 1).map((dossier) => {
-                const status = dossierStatus(dossier.id, dossier1Done, dossier2Done);
+                const status = dossierStatus(dossier.id, {
+                  dossier1Done,
+                  dossier2Done,
+                  dossier3Done,
+                  dossier4Done,
+                  dossier5Done,
+                });
                 return (
                   <button
                     key={dossier.id}
@@ -268,12 +305,30 @@ export function PhaseOne({
         ) : null}
 
         {screen === "dossier3" ? (
-          <DossierThree key={`d3-${embargoTask}`} startTask={embargoTask} onMenu={goHome} />
+          <DossierThree
+            key={`d3-${embargoTask}`}
+            startTask={embargoTask}
+            onMenu={goHome}
+            onComplete={async () => {
+              window.localStorage.setItem(`ado-d3-done:${teamId}`, "1");
+              const saved = await onProgress(DOSSIER3_STEP, "done");
+              if (saved) goHome();
+              return saved;
+            }}
+          />
         ) : null}
 
         {screen === "walkthrough" ? (
           <section className="mg-walk">
-            <Walkthrough startedAt={startedAt} stepIndex={walkStep} onStepIndex={setWalkStep} />
+            <Walkthrough
+              startedAt={startedAt}
+              stepIndex={walkStep}
+              onStepIndex={setWalkStep}
+              onLevelComplete={async (level) => {
+                if (level === 4) await onProgress(DOSSIER4_STEP, "done");
+                if (level === 5) await onProgress(DOSSIER5_STEP, "done");
+              }}
+            />
           </section>
         ) : null}
 
@@ -492,14 +547,34 @@ function isEmbargoTask(value: unknown): value is 7 | 8 | 9 {
   return value === 7 || value === 8 || value === 9;
 }
 
-function dossierStatus(id: number, dossier1Done: boolean, dossier2Done: boolean) {
+function dossierStatus(
+  id: number,
+  flags: {
+    dossier1Done: boolean;
+    dossier2Done: boolean;
+    dossier3Done: boolean;
+    dossier4Done: boolean;
+    dossier5Done: boolean;
+  },
+) {
   if (id === 2) {
-    if (dossier2Done) return "Voltooid";
-    if (dossier1Done) return "Ontgrendeld";
+    if (flags.dossier2Done) return "Voltooid";
+    if (flags.dossier1Done) return "Ontgrendeld";
     return "Vergrendeld";
   }
   if (id === 3) {
-    if (dossier2Done) return "Ontgrendeld";
+    if (flags.dossier3Done) return "Voltooid";
+    if (flags.dossier2Done) return "Ontgrendeld";
+    return "Vergrendeld";
+  }
+  if (id === 4) {
+    if (flags.dossier4Done) return "Voltooid";
+    if (flags.dossier3Done) return "Ontgrendeld";
+    return "Vergrendeld";
+  }
+  if (id === 5) {
+    if (flags.dossier5Done) return "Voltooid";
+    if (flags.dossier4Done) return "Ontgrendeld";
     return "Vergrendeld";
   }
   return "Vergrendeld";
