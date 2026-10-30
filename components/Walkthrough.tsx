@@ -257,7 +257,7 @@ function ChoiceCard({
         {step.choices.map((choice) => (
           <button
             key={choice.id}
-            className="choice"
+            className={`choice${selected === choice.id ? " is-on" : ""}`}
             type="button"
             role="radio"
             aria-checked={selected === choice.id}
