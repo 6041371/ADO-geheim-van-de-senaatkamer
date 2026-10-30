@@ -4,7 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { DOSSIERS, EVIDENCE, HINTS, LOCKED_MESSAGE, completedTasks, type HintSet } from "@/lib/level1";
 import { DOSSIER2_EVIDENCE, DOSSIER2_HINTS, dossier1Complete, dossier2Complete, dossier2DoneCount } from "@/lib/level2";
 import type { Phase } from "@/lib/events/types";
-import { ALL_JUMPS, firstWalkStepForLevel, type GameScreen, type JumpTarget } from "@/lib/walkthrough-jumps";
+import { firstWalkStepForLevel, type GameScreen } from "@/lib/walkthrough-jumps";
 import { Logo } from "@/components/Logo";
 import { Walkthrough } from "@/components/Walkthrough";
 import { DossierThree } from "./DossierThree";
@@ -31,7 +31,6 @@ export function PhaseOne({
   phase,
   notice,
   onProgress,
-  onJump,
   onReplay,
 }: {
   teamId: string;
@@ -56,7 +55,7 @@ export function PhaseOne({
   const [walkStep, setWalkStep] = useState(fallback.walkStep);
   const [embargoTask, setEmbargoTask] = useState<7 | 8 | 9>(fallback.embargoTask);
   const [startedAt] = useState(() => Date.now());
-  const [panel, setPanel] = useState<"hints" | "evidence" | "jumps" | null>(null);
+  const [panel, setPanel] = useState<"hints" | "evidence" | null>(null);
   const [hintLevel, setHintLevel] = useState(0);
   const [banner, setBanner] = useState<string | null>(null);
   const rememberTask = useCallback((task: 4 | 5 | 6) => setDossierTask(task), []);
@@ -103,20 +102,6 @@ export function PhaseOne({
   }
 
   async function openDossier(id: number) {
-    if (id === 3) {
-      setBanner(null);
-      setForcedDossierTask(null);
-      setEmbargoTask(7);
-      setScreen("dossier3");
-      return;
-    }
-    if (id >= 4) {
-      setBanner(null);
-      setForcedDossierTask(null);
-      setWalkStep(firstWalkStepForLevel(id));
-      setScreen("walkthrough");
-      return;
-    }
     if (id === 2) {
       if (!dossier1Done) {
         setBanner(LOCKED_MESSAGE);
@@ -125,6 +110,28 @@ export function PhaseOne({
       setBanner(null);
       setForcedDossierTask(null);
       setScreen(dossier2Done ? "dossier2end" : "dossier2");
+      return;
+    }
+    if (id === 3) {
+      if (!dossier2Done) {
+        setBanner(LOCKED_MESSAGE);
+        return;
+      }
+      setBanner(null);
+      setForcedDossierTask(null);
+      setEmbargoTask(7);
+      setScreen("dossier3");
+      return;
+    }
+    if (id >= 4) {
+      if (!dossier2Done) {
+        setBanner(LOCKED_MESSAGE);
+        return;
+      }
+      setBanner(null);
+      setForcedDossierTask(null);
+      setWalkStep(firstWalkStepForLevel(id));
+      setScreen("walkthrough");
       return;
     }
     if (id !== 1) {
@@ -149,47 +156,6 @@ export function PhaseOne({
 
   async function solve(nextStep: number, nextPhase: Phase) {
     return onProgress(nextStep, nextPhase);
-  }
-
-  async function replayLevels() {
-    const saved = await onReplay();
-    if (!saved) return;
-    for (const key of Object.keys(window.localStorage)) {
-      if (key.startsWith(`ado-hints:${teamId}:`) || key === viewKey(teamId) || key === introKey(teamId)) {
-        window.localStorage.removeItem(key);
-      }
-    }
-    setForcedDossierTask(null);
-    setTaskIndex(0);
-    setDossierTask(4);
-    setWalkStep(0);
-    setEmbargoTask(7);
-    setHintLevel(0);
-    setPanel(null);
-    setBanner(null);
-    setScreen("menu");
-  }
-
-  async function jumpTo(target: JumpTarget) {
-    setBanner(null);
-    setPanel(null);
-    setHintLevel(0);
-    window.localStorage.setItem(introKey(teamId), "1");
-    window.sessionStorage.setItem("ado-intro-seen", "1");
-    setIntroSeen(true);
-    setReplay(false);
-    const jump = onJump ?? onProgress;
-    const saved = await jump(target.step, target.phase);
-    if (!saved) {
-      setBanner("Test-sprong mislukt. Is het evenement gestart?");
-      return;
-    }
-    setTaskIndex(target.taskIndex);
-    setDossierTask(target.dossierTask);
-    setForcedDossierTask(target.screen === "dossier2" ? target.dossierTask : null);
-    if (typeof target.walkStep === "number") setWalkStep(target.walkStep);
-    if (target.embargoTask) setEmbargoTask(target.embargoTask);
-    setScreen(target.screen);
   }
 
   if (!ready) return <p className="boot">Jullie onderzoek wordt hervat.</p>;
@@ -222,21 +188,6 @@ export function PhaseOne({
             <button className="mg-yellow mg-cta" type="button" onClick={() => void openDossier(1)}>
               {dossier1Done ? "Dossier 01 bekijken" : "Start onderzoek"}
             </button>
-            <button className="mg-ghost mg-cta" type="button" onClick={() => void replayLevels()}>
-              Tijdelijk: levels opnieuw
-            </button>
-            <section className="mg-dev" aria-label="Testnavigatie">
-              <p className="mg-kicker">Test: spring naar opdracht</p>
-              <p className="mg-dev-note">Kies een opdracht. Werkt ook als je nog niet zo ver bent.</p>
-              <div className="mg-dev-grid">
-                {ALL_JUMPS.map((item) => (
-                  <button key={item.id} type="button" onClick={() => void jumpTo(item)}>
-                    <strong>{item.label}</strong>
-                    {item.detail}
-                  </button>
-                ))}
-              </div>
-            </section>
             <div className="mg-dossiers">
               {DOSSIERS.filter((dossier) => dossier.id > 1).map((dossier) => {
                 const status = dossierStatus(dossier.id, dossier1Done, dossier2Done);
@@ -342,7 +293,7 @@ export function PhaseOne({
 
         {notice ? <p className="mg-bad">{notice}</p> : null}
 
-        <nav className="mg-nav mg-nav-4">
+        <nav className="mg-nav">
           <button type="button" onClick={() => setScreen("menu")}>
             Home
           </button>
@@ -351,9 +302,6 @@ export function PhaseOne({
           </button>
           <button type="button" onClick={() => setPanel("hints")}>
             Hints
-          </button>
-          <button type="button" onClick={() => setPanel(panel === "jumps" ? null : "jumps")}>
-            Levels
           </button>
         </nav>
 
@@ -403,27 +351,6 @@ export function PhaseOne({
                     </div>
                   </>
                 )}
-              </>
-            ) : null}
-            {panel === "jumps" ? (
-              <>
-                <h2>Test: levels</h2>
-                <p>Spring direct naar elke opdracht in dossier 01 t/m 05.</p>
-                <div className="mg-dev-grid">
-                  {ALL_JUMPS.map((item) => (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => {
-                        setPanel(null);
-                        void jumpTo(item);
-                      }}
-                    >
-                      <strong>{item.label}</strong>
-                      {item.detail}
-                    </button>
-                  ))}
-                </div>
               </>
             ) : null}
             <button className="mg-ghost" type="button" onClick={() => setPanel(null)}>
@@ -562,6 +489,13 @@ function dossierStatus(id: number, dossier1Done: boolean, dossier2Done: boolean)
     if (dossier1Done) return "Ontgrendeld";
     return "Vergrendeld";
   }
-  if (id >= 3) return "Test · open";
+  if (id === 3) {
+    if (dossier2Done) return "Ontgrendeld";
+    return "Vergrendeld";
+  }
+  if (id >= 4) {
+    if (dossier2Done) return "Ontgrendeld";
+    return "Vergrendeld";
+  }
   return "Vergrendeld";
 }
