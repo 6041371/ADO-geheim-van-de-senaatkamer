@@ -463,6 +463,7 @@ p.story,
   margin-top: 8px;
   padding: 8px 10px;
   background: var(--yellow);
+  color: #080808;
   font-family: var(--font-label), sans-serif;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -3652,6 +3653,41 @@ p.story,
 .mg-walk .feedback {
   color: #5c1212;
   background: #f8d0c8;
+}
+
+.mg-walk p.hint,
+.mg-walk .hint {
+  color: #080808;
+  background: #ffe000;
+}
+
+.mg-walk .field span,
+.mg-walk .field .prompt {
+  color: #ffe000;
+}
+
+.mg-walk .field input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 224, 0, 0.45);
+  border-radius: 12px;
+  background: #07140f;
+  padding: 14px 14px;
+  color: #fff;
+  caret-color: #ffe000;
+  -webkit-text-fill-color: #fff;
+  font-size: var(--mg-text);
+  line-height: 1.35;
+}
+
+.mg-walk .field input::placeholder {
+  color: rgba(244, 241, 228, 0.55);
+  -webkit-text-fill-color: rgba(244, 241, 228, 0.55);
+}
+
+.mg-walk .field input:focus {
+  outline: 2px solid #ffe000;
+  outline-offset: 2px;
 }
 
 .mg-walk .actions {

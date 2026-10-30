@@ -388,6 +388,9 @@ function DaderCard({
         <input
           value={answer}
           autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
+          placeholder="Typ de volledige naam"
           onChange={(event) => onChange(event.target.value)}
           onKeyDown={(event) => {
             if (event.key === "Enter") onCheck();
