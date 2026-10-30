@@ -18,7 +18,7 @@ export function Walkthrough({
   onStepIndex,
   onLevelComplete,
 }: {
-  startedAt: number;
+  startedAt: number | null;
   stepIndex: number;
   onStepIndex: (index: number) => void;
   onLevelComplete?: (level: number) => void | Promise<void>;
