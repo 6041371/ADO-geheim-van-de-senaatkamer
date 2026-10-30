@@ -12,7 +12,13 @@ import {
   dossier5Complete,
 } from "@/lib/level3";
 import type { Phase } from "@/lib/events/types";
-import { firstWalkStepForLevel, lastWalkStepForLevel, type GameScreen } from "@/lib/walkthrough-jumps";
+import {
+  ALL_JUMPS,
+  firstWalkStepForLevel,
+  lastWalkStepForLevel,
+  type GameScreen,
+  type JumpTarget,
+} from "@/lib/walkthrough-jumps";
 import { GameClock } from "@/components/GameClock";
 import { Logo } from "@/components/Logo";
 import { Walkthrough } from "@/components/Walkthrough";
@@ -41,6 +47,7 @@ export function PhaseOne({
   startedAt,
   notice,
   onProgress,
+  onJump,
   onReplay,
   onLeave,
 }: {
@@ -70,7 +77,7 @@ export function PhaseOne({
   const [forcedDossierTask, setForcedDossierTask] = useState<4 | 5 | 6 | null>(fallback.forcedDossierTask);
   const [walkStep, setWalkStep] = useState(fallback.walkStep);
   const [embargoTask, setEmbargoTask] = useState<7 | 8 | 9>(fallback.embargoTask);
-  const [panel, setPanel] = useState<"hints" | "evidence" | null>(null);
+  const [panel, setPanel] = useState<"hints" | "evidence" | "jumps" | null>(null);
   const [hintLevel, setHintLevel] = useState(0);
   const [banner, setBanner] = useState<string | null>(null);
   const rememberTask = useCallback((task: 4 | 5 | 6) => setDossierTask(task), []);
@@ -192,6 +199,28 @@ export function PhaseOne({
     setScreen("menu");
   }
 
+  async function jumpTo(target: JumpTarget) {
+    setBanner(null);
+    setPanel(null);
+    setHintLevel(0);
+    window.localStorage.setItem(introKey(teamId), "1");
+    window.sessionStorage.setItem("ado-intro-seen", "1");
+    setIntroSeen(true);
+    setReplay(false);
+    const jump = onJump ?? onProgress;
+    const saved = await jump(target.step, target.phase);
+    if (!saved) {
+      setBanner("Test-sprong mislukt. Is het evenement gestart?");
+      return;
+    }
+    setTaskIndex(target.taskIndex);
+    setDossierTask(target.dossierTask);
+    setForcedDossierTask(target.screen === "dossier2" ? target.dossierTask : null);
+    if (typeof target.walkStep === "number") setWalkStep(target.walkStep);
+    if (target.embargoTask) setEmbargoTask(target.embargoTask);
+    setScreen(target.screen);
+  }
+
   if (!ready) return <p className="boot">Jullie onderzoek wordt hervat.</p>;
   if (!introSeen || replay) {
     return (
@@ -245,6 +274,9 @@ export function PhaseOne({
             </figure>
             <button className="mg-yellow mg-cta" type="button" onClick={() => void openDossier(1)}>
               {dossier1Done ? "Dossier 01 bekijken" : "Start onderzoek"}
+            </button>
+            <button className="mg-ghost mg-cta" type="button" onClick={() => setPanel("jumps")}>
+              Test: spring naar opdracht
             </button>
             <div className="mg-dossiers">
               {DOSSIERS.filter((dossier) => dossier.id > 1).map((dossier) => {
@@ -375,7 +407,7 @@ export function PhaseOne({
 
         {notice ? <p className="mg-bad">{notice}</p> : null}
 
-        <nav className="mg-nav">
+        <nav className="mg-nav mg-nav-4">
           <button type="button" onClick={goHome}>
             Home
           </button>
@@ -384,6 +416,9 @@ export function PhaseOne({
           </button>
           <button type="button" onClick={() => setPanel("hints")}>
             Hints
+          </button>
+          <button type="button" onClick={() => setPanel(panel === "jumps" ? null : "jumps")}>
+            Test
           </button>
         </nav>
 
@@ -401,6 +436,20 @@ export function PhaseOne({
                     <p>{item.text}</p>
                   </article>
                 ))}
+              </>
+            ) : null}
+            {panel === "jumps" ? (
+              <>
+                <h2>Test: spring naar opdracht</h2>
+                <p>Werkt ook als je nog niet zo ver bent. Handig voor persconferentie, memory en het einde.</p>
+                <div className="mg-dev-grid">
+                  {ALL_JUMPS.map((item) => (
+                    <button key={item.id} type="button" onClick={() => void jumpTo(item)}>
+                      <strong>{item.label}</strong>
+                      {item.detail}
+                    </button>
+                  ))}
+                </div>
               </>
             ) : null}
             {panel === "hints" ? (
