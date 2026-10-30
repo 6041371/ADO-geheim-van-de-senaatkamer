@@ -12,13 +12,6 @@ import {
 } from "@/lib/game";
 import { shuffle } from "@/lib/shuffle";
 
-function formatTime(ms: number) {
-  const total = Math.max(0, Math.ceil(ms / 1000));
-  const minutes = Math.floor(total / 60);
-  const seconds = total % 60;
-  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-}
-
 export function Walkthrough({
   startedAt,
   stepIndex,
@@ -63,6 +56,14 @@ export function Walkthrough({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step.kind, step.level]);
 
+  useEffect(() => {
+    if (!startedAt) return;
+    const tick = () => setOvertime(Date.now() - startedAt >= GAME_MINUTES * 60 * 1000);
+    tick();
+    const timer = window.setInterval(tick, 1000);
+    return () => window.clearInterval(timer);
+  }, [startedAt]);
+
   return (
     <main className="app">
       <header className="top">
@@ -70,7 +71,6 @@ export function Walkthrough({
           <small>ADO Den Haag · 1905</small>
           <strong>Het Geheim van de Senaatskamer</strong>
         </div>
-        <Clock startedAt={startedAt} onOvertime={setOvertime} />
       </header>
 
       <LevelTrack current={step.level} />
@@ -146,38 +146,6 @@ export function Walkthrough({
         <Finale />
       )}
     </main>
-  );
-}
-
-export function Clock({
-  startedAt,
-  onOvertime,
-}: {
-  startedAt: number | null;
-  onOvertime: (overtime: boolean) => void;
-}) {
-  const [now, setNow] = useState(() => Date.now());
-
-  useEffect(() => {
-    if (!startedAt) return;
-    const tick = () => {
-      const current = Date.now();
-      setNow(current);
-      onOvertime(current - startedAt >= GAME_MINUTES * 60 * 1000);
-    };
-    tick();
-    const timer = window.setInterval(tick, 1000);
-    return () => window.clearInterval(timer);
-  }, [startedAt, onOvertime]);
-
-  const remaining = startedAt ? GAME_MINUTES * 60 * 1000 - (now - startedAt) : GAME_MINUTES * 60 * 1000;
-  const overtime = startedAt !== null && remaining <= 0;
-
-  return (
-    <div className={overtime ? "timer over" : "timer"}>
-      <span>{overtime ? "Tijd voorbij" : "Resterend"}</span>
-      <strong>{formatTime(remaining)}</strong>
-    </div>
   );
 }
 

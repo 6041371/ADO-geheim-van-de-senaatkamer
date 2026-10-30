@@ -13,6 +13,7 @@ import {
 } from "@/lib/level3";
 import type { Phase } from "@/lib/events/types";
 import { firstWalkStepForLevel, lastWalkStepForLevel, type GameScreen } from "@/lib/walkthrough-jumps";
+import { GameClock } from "@/components/GameClock";
 import { Logo } from "@/components/Logo";
 import { Walkthrough } from "@/components/Walkthrough";
 import { DossierThree } from "./DossierThree";
@@ -37,6 +38,7 @@ export function PhaseOne({
   teamId,
   stepIndex,
   phase,
+  startedAt,
   notice,
   onProgress,
   onReplay,
@@ -45,6 +47,7 @@ export function PhaseOne({
   teamId: string;
   stepIndex: number;
   phase: Phase;
+  startedAt: number | null;
   notice?: string | null;
   onProgress: (stepIndex: number, phase: Phase) => Promise<boolean>;
   onJump?: (stepIndex: number, phase: Phase) => Promise<boolean>;
@@ -67,7 +70,6 @@ export function PhaseOne({
   const [forcedDossierTask, setForcedDossierTask] = useState<4 | 5 | 6 | null>(fallback.forcedDossierTask);
   const [walkStep, setWalkStep] = useState(fallback.walkStep);
   const [embargoTask, setEmbargoTask] = useState<7 | 8 | 9>(fallback.embargoTask);
-  const [startedAt] = useState(() => Date.now());
   const [panel, setPanel] = useState<"hints" | "evidence" | null>(null);
   const [hintLevel, setHintLevel] = useState(0);
   const [banner, setBanner] = useState<string | null>(null);
@@ -191,7 +193,19 @@ export function PhaseOne({
   }
 
   if (!ready) return <p className="boot">Jullie onderzoek wordt hervat.</p>;
-  if (!introSeen || replay) return <IntroFilm onDone={finishIntro} />;
+  if (!introSeen || replay) {
+    return (
+      <div className="mg">
+        <div className="mg-phone">
+          <div className="mg-clock-bar">
+            <p className="mg-clock-label">Onderzoekstijd</p>
+            <GameClock startedAt={startedAt} compact />
+          </div>
+          <IntroFilm onDone={finishIntro} />
+        </div>
+      </div>
+    );
+  }
 
   const hint = screen === "dossier2" || screen === "dossier2end" ? DOSSIER2_HINTS[dossierTask] : (TASK_HINTS[taskIndex] ?? HINTS.attendance);
   const shownEvidence = [
@@ -202,6 +216,10 @@ export function PhaseOne({
   return (
     <div className="mg">
       <div className="mg-phone">
+        <div className="mg-clock-bar">
+          <p className="mg-clock-label">Onderzoekstijd</p>
+          <GameClock startedAt={startedAt} compact />
+        </div>
         {screen === "menu" ? (
           <section className="mg-splash">
             <button

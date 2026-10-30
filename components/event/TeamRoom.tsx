@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { SealedLiveQuery } from "@neon/realtime/client";
 import { useLiveQuery } from "@neon/realtime-react";
 import type { Phase, TeamRow } from "@/lib/events/types";
+import { eventStartedAtMs, GameClock } from "@/components/GameClock";
 import { Logo } from "@/components/Logo";
 import { PhaseOne } from "@/components/phase1/PhaseOne";
 import { getJson, postJson } from "./api";
@@ -275,10 +276,15 @@ function TeamStage({ row, degraded, onHome }: { row: TeamRow; degraded: boolean;
     );
   }
 
+  const startedAtMs = eventStartedAtMs(current.started_at);
+
   if (current.phase === "intro" && !briefingSeen) {
     return (
       <main className="app dossier">
-        <Brand />
+        <div className="game-clock-row">
+          <Brand />
+          <GameClock startedAt={startedAtMs} compact />
+        </div>
         <article className="paper stack briefing">
           <span className="stamp">Geheim dossier</span>
           <p className="kicker">Eerste briefing</p>
@@ -340,6 +346,7 @@ function TeamStage({ row, degraded, onHome }: { row: TeamRow; degraded: boolean;
       teamId={current.id}
       stepIndex={current.step_index}
       phase={current.phase}
+      startedAt={startedAtMs}
       notice={error ?? (degraded ? "De live verbinding is onderbroken. De voortgang blijft via de database bij." : null)}
       onProgress={save}
       onJump={jump}
