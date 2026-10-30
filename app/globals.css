@@ -447,6 +447,9 @@ p.story,
   margin-top: 14px;
   padding: 12px 14px;
   background: #f8d0c8;
+  color: #5c1212;
+  border-radius: 10px;
+  border: 1px solid rgba(157, 28, 28, 0.28);
 }
 
 .reveal {
@@ -3643,6 +3646,12 @@ p.story,
   font-size: var(--mg-text);
   line-height: var(--mg-text-tight);
   color: #f4f1e4;
+}
+
+.mg-walk p.feedback,
+.mg-walk .feedback {
+  color: #5c1212;
+  background: #f8d0c8;
 }
 
 .mg-walk .actions {
